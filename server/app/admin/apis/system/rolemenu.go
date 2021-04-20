@@ -1,7 +1,7 @@
 package system
 
 import (
-	"go-admin/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
 )
 
 // @Summary RoleMenu列表数据

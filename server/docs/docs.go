@@ -21,7 +21,7 @@ var doc = `{
         "contact": {},
         "license": {
             "name": "MIT",
-            "url": "https://github.com/go-admin-team/go-admin/blob/master/LICENSE.md"
+            "url": "https://github.com/go-admin-team/github.com/tanganyu1114/ansible-role-manager/blob/master/LICENSE.md"
         },
         "version": "{{.Version}}"
     },

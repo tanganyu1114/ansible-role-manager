@@ -4,15 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg"
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 	"os"
 
 	"github.com/spf13/cobra"
 
-	"go-admin/cmd/api"
-	"go-admin/cmd/config"
-	"go-admin/cmd/migrate"
-	"go-admin/cmd/version"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/api"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/config"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/migrate"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/version"
 )
 
 var rootCmd = &cobra.Command{

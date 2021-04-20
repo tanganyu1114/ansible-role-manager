@@ -1,7 +1,7 @@
 package version
 
 import (
-	"go-admin/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
 )
 
 type DictData struct {

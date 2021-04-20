@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 
-	"go-admin/app/admin/models/system"
-	"go-admin/common/dto"
-	common "go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/common/dto"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 // SysConfigSearch 列表或者搜索使用结构体

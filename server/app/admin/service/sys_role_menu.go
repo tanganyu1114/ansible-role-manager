@@ -2,9 +2,9 @@ package service
 
 import (
 	log "github.com/go-admin-team/go-admin-core/logger"
-	"go-admin/app/admin/models"
-	"go-admin/app/admin/models/system"
-	"go-admin/common/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/common/service"
 	"gorm.io/gorm"
 )
 

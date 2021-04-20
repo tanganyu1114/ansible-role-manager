@@ -3,8 +3,8 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
-	"go-admin/app/admin/apis/sys_china_area_data"
-	middleware2 "go-admin/common/middleware"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/sys_china_area_data"
+	middleware2 "github.com/tanganyu1114/ansible-role-manager/common/middleware"
 )
 
 func init() {

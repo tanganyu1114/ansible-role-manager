@@ -4,10 +4,10 @@ import (
 	"github.com/robfig/cron/v3"
 	"time"
 
-	"go-admin/app/admin/models"
-	"go-admin/app/jobs"
-	"go-admin/common/dto"
-	"go-admin/common/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/jobs"
+	"github.com/tanganyu1114/ansible-role-manager/common/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/service"
 )
 
 type SysJob struct {

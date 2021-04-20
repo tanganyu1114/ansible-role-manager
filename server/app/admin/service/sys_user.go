@@ -7,11 +7,11 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg"
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models/system"
-	"go-admin/common/actions"
-	cDto "go-admin/common/dto"
-	common "go-admin/common/models"
-	"go-admin/common/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/common/actions"
+	cDto "github.com/tanganyu1114/ansible-role-manager/common/dto"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/common/service"
 )
 
 type SysUser struct {

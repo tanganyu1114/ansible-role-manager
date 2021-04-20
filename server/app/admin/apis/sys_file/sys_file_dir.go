@@ -7,11 +7,11 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 
-	"go-admin/app/admin/models"
-	"go-admin/app/admin/service"
-	"go-admin/app/admin/service/dto"
-	"go-admin/common/actions"
-	"go-admin/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/actions"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 )
 
 type SysFileDir struct {

@@ -6,11 +6,11 @@ import (
 
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models"
-	"go-admin/app/admin/service/dto"
-	"go-admin/common/actions"
-	cDto "go-admin/common/dto"
-	"go-admin/common/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/actions"
+	cDto "github.com/tanganyu1114/ansible-role-manager/common/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/service"
 )
 
 type SysFileDir struct {

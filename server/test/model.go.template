@@ -1,8 +1,8 @@
 package models
 
 import (
-orm "go-admin/global"
-"go-admin/utils"
+orm "github.com/tanganyu1114/ansible-role-manager/global"
+"github.com/tanganyu1114/ansible-role-manager/utils"
 "time"
 )
 

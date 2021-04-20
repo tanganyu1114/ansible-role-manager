@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"log"

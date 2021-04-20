@@ -14,11 +14,11 @@ import (
 
 	"github.com/go-admin-team/go-admin-core/sdk/config"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/logger"
-	"go-admin/cmd/migrate/migration"
-	_ "go-admin/cmd/migrate/migration/version"
-	_ "go-admin/cmd/migrate/migration/version-local"
-	"go-admin/common/database"
-	"go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/migrate/migration"
+	_ "github.com/tanganyu1114/ansible-role-manager/cmd/migrate/migration/version"
+	_ "github.com/tanganyu1114/ansible-role-manager/cmd/migrate/migration/version-local"
+	"github.com/tanganyu1114/ansible-role-manager/common/database"
+	"github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 var (

@@ -5,8 +5,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models"
-	"go-admin/common/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/common/service"
 )
 
 type SysSetting struct {

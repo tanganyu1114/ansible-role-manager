@@ -3,7 +3,7 @@ package system
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/captcha"
-	"go-admin/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 )
 
 type System struct {

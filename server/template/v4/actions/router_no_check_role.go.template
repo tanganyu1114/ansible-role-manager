@@ -3,10 +3,10 @@ package router
 import (
     "github.com/gin-gonic/gin"
 
-    "go-admin/app/{{.PackageName}}/middleware"
-    "go-admin/app/{{.PackageName}}/models"
-    "go-admin/app/{{.PackageName}}/service/dto"
-    "go-admin/common/actions"
+    "github.com/tanganyu1114/ansible-role-manager/app/{{.PackageName}}/middleware"
+    "github.com/tanganyu1114/ansible-role-manager/app/{{.PackageName}}/models"
+    "github.com/tanganyu1114/ansible-role-manager/app/{{.PackageName}}/service/dto"
+    "github.com/tanganyu1114/ansible-role-manager/common/actions"
 )
 
 func init()  {

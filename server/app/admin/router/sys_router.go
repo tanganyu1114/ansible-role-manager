@@ -9,16 +9,16 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 
-	"go-admin/app/admin/apis/monitor"
-	"go-admin/app/admin/apis/public"
-	"go-admin/app/admin/apis/system"
-	"go-admin/app/admin/apis/system/dict"
-	"go-admin/app/admin/apis/system/sys_dept"
-	"go-admin/app/admin/apis/system/sys_menu"
-	"go-admin/app/admin/apis/tools"
-	"go-admin/common/middleware"
-	"go-admin/common/middleware/handler"
-	_ "go-admin/docs"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/monitor"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/public"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/system/dict"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/system/sys_dept"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/system/sys_menu"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/tools"
+	"github.com/tanganyu1114/ansible-role-manager/common/middleware"
+	"github.com/tanganyu1114/ansible-role-manager/common/middleware/handler"
+	_ "github.com/tanganyu1114/ansible-role-manager/docs"
 )
 
 func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.RouterGroup {

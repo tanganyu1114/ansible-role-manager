@@ -8,13 +8,13 @@ import (
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 	"github.com/google/uuid"
 
-	"go-admin/app/admin/models"
-	"go-admin/app/admin/models/system"
-	"go-admin/app/admin/service"
-	"go-admin/app/admin/service/dto"
-	"go-admin/common/actions"
-	"go-admin/common/apis"
-	common "go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/actions"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 type SysUser struct {

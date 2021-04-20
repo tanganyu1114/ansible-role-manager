@@ -3,7 +3,7 @@ package version
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 )
 
 var (

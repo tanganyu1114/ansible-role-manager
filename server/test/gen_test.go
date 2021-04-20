@@ -1,7 +1,7 @@
 package test
 
 import (
-	//"go-admin/models/tools"
+	//"github.com/tanganyu1114/ansible-role-manager/models/tools"
 	//"os"
 	"testing"
 	//"text/template"

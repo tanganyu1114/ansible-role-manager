@@ -2,7 +2,7 @@ package dto
 
 import (
 	"github.com/go-admin-team/go-admin-core/tools/search"
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 	"gorm.io/gorm"
 )
 

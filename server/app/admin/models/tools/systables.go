@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 	"strings"
 
-	"go-admin/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
 )
 
 type SysTables struct {

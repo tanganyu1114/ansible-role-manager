@@ -10,8 +10,8 @@ import (
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models/tools"
-	"go-admin/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/tools"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 )
 
 type SysTable struct {

@@ -4,8 +4,8 @@ package sys_content
 //	"github.com/gin-gonic/gin"
 //	"github.com/gin-gonic/gin/binding"
 //
-//	"go-admin/app/admin/models"
-//	"go-admin/tools"
+//	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+//	"github.com/tanganyu1114/ansible-role-manager/tools"
 //	"github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 //	"github.com/go-admin-team/go-admin-core/sdk/pkg/response/msg"
 //)

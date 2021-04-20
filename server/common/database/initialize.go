@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 )
 
 // Setup 配置数据库

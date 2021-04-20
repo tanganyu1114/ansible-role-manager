@@ -14,8 +14,8 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 	"github.com/mssola/user_agent"
 
-	"go-admin/app/admin/models/system"
-	"go-admin/common/global"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
 )
 
 func PayloadFunc(data interface{}) jwt.MapClaims {

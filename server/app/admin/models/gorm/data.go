@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"go-admin/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
 	"gorm.io/gorm"
 )
 

@@ -10,8 +10,8 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/config"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg"
 
-	common "go-admin/common/middleware"
-	"go-admin/common/middleware/handler"
+	common "github.com/tanganyu1114/ansible-role-manager/common/middleware"
+	"github.com/tanganyu1114/ansible-role-manager/common/middleware/handler"
 )
 
 // InitRouter 路由初始化，不要怀疑，这里用到了

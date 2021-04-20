@@ -7,11 +7,11 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth/user"
 	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
 
-	"go-admin/app/admin/models/system"
-	"go-admin/app/admin/service"
-	"go-admin/app/admin/service/dto"
-	"go-admin/common/apis"
-	common "go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/service/dto"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 type SysDictData struct {

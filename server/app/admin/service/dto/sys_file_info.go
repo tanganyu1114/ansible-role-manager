@@ -1,9 +1,9 @@
 package dto
 
 import (
-	"go-admin/app/admin/models"
-	"go-admin/common/dto"
-	common "go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/common/dto"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 type SysFileInfoSearch struct {

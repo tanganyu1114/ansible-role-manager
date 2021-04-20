@@ -9,7 +9,7 @@ import (
 	log "github.com/go-admin-team/go-admin-core/logger"
 	"github.com/go-admin-team/go-admin-core/sdk"
 
-	"go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 type SysLoginLog struct {

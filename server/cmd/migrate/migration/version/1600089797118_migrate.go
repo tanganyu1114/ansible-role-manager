@@ -5,9 +5,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models"
-	"go-admin/cmd/migrate/migration"
-	common "go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/cmd/migrate/migration"
+	common "github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 func init() {

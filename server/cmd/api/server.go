@@ -18,12 +18,12 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/logger"
 	"github.com/spf13/cobra"
 
-	"go-admin/app/admin/models/system"
-	"go-admin/app/admin/router"
-	"go-admin/app/jobs"
-	"go-admin/common/database"
-	"go-admin/common/global"
-	ext "go-admin/config"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/router"
+	"github.com/tanganyu1114/ansible-role-manager/app/jobs"
+	"github.com/tanganyu1114/ansible-role-manager/common/database"
+	"github.com/tanganyu1114/ansible-role-manager/common/global"
+	ext "github.com/tanganyu1114/ansible-role-manager/config"
 )
 
 var (

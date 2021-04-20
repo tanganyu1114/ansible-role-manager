@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"go-admin/app/admin/models/system"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/system"
 )
 
 type Menu struct {

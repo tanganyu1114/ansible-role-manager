@@ -12,8 +12,8 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/pkg/utils"
 	"github.com/google/uuid"
 
-	"go-admin/common/apis"
-	"go-admin/common/file_store"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/common/file_store"
 )
 
 type FileResponse struct {

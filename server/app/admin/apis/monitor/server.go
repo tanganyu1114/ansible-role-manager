@@ -10,7 +10,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 
-	"go-admin/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 )
 
 const (

@@ -12,9 +12,9 @@ import (
 	"github.com/go-admin-team/go-admin-core/sdk/config"
 	"github.com/go-admin-team/go-admin-core/sdk/pkg"
 
-	"go-admin/app/admin/models"
-	"go-admin/app/admin/models/tools"
-	"go-admin/common/apis"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models"
+	"github.com/tanganyu1114/ansible-role-manager/app/admin/models/tools"
+	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 )
 
 type Gen struct {

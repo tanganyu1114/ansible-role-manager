@@ -4,10 +4,10 @@ import (
     "github.com/gin-gonic/gin"
     jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
 
-    "go-admin/app/{{.PackageName}}/models"
-    "go-admin/app/{{.PackageName}}/service/dto"
-    "go-admin/common/actions"
-    "go-admin/common/middleware"
+    "github.com/tanganyu1114/ansible-role-manager/app/{{.PackageName}}/models"
+    "github.com/tanganyu1114/ansible-role-manager/app/{{.PackageName}}/service/dto"
+    "github.com/tanganyu1114/ansible-role-manager/common/actions"
+    "github.com/tanganyu1114/ansible-role-manager/common/middleware"
 )
 
 func init()  {

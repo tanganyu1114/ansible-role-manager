@@ -1,7 +1,7 @@
 package system
 
 import (
-	"go-admin/common/models"
+	"github.com/tanganyu1114/ansible-role-manager/common/models"
 )
 
 type SysDictType struct {
