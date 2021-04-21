@@ -19,15 +19,15 @@ func NewIPv4Host(ip [4]byte) Host {
 }
 
 func NewHost(ip []byte, ipv6Zone string) (Host, error) {
-	if len(ip) != net.IPv4len || len(ip) != net.IPv6len {
+	if len(ip) != net.IPv4len && len(ip) != net.IPv6len {
 		return nil, fmt.Errorf("ip [%v] is not a valid ipaddress", ip)
 	}
 	h := &host{ipAddr: net.IPAddr{
-		IP:   net.IP{},
+		IP:   make(net.IP, 0),
 		Zone: ipv6Zone,
 	}}
 	for i := 0; i < len(ip); i++ {
-		h.ipAddr.IP[i] = ip[i]
+		h.ipAddr.IP = append(h.ipAddr.IP, ip[i])
 	}
 	return Host(h), nil
 }

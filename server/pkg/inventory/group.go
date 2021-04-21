@@ -32,8 +32,20 @@ func (g *group) addHost(hosts ...Host) error {
 	}
 	isIn := true
 	for _, h := range hosts {
+		if h == nil {
+			continue
+		}
 		idx := sort.Search(g.HostsLen(), func(i int) bool {
-			return g.hosts[i].GetIp().IP.Equal(h.GetIp().IP)
+			if !g.hosts[i].GetIp().IP.Equal(h.GetIp().IP) {
+				iIPv4 := g.hosts[i].GetIp().IP.To4()
+				hIPv4 := h.GetIp().IP.To4()
+				for j := 0; j < net.IPv4len; j++ {
+					if iIPv4[j] < hIPv4[j] {
+						return false
+					}
+				}
+			}
+			return true
 		})
 		if idx < g.HostsLen() && g.hosts[idx].GetIp().IP.Equal(h.GetIp().IP) {
 			continue
@@ -41,8 +53,8 @@ func (g *group) addHost(hosts ...Host) error {
 		isIn = false
 		g.hosts = append(g.hosts, h)
 		sort.Slice(g.hosts, func(x, y int) bool {
-			xIPv4 := hosts[x].GetIp().IP.To4()
-			yIPv4 := hosts[y].GetIp().IP.To4()
+			xIPv4 := g.hosts[x].GetIp().IP.To4()
+			yIPv4 := g.hosts[y].GetIp().IP.To4()
 			for j := 0; j < net.IPv4len; j++ {
 				if xIPv4[j] < yIPv4[j] {
 					return true
@@ -62,6 +74,9 @@ func (g *group) removeHost(hosts ...Host) {
 		return
 	}
 	for _, h := range hosts {
+		if h == nil {
+			continue
+		}
 		idx := sort.Search(g.HostsLen(), func(i int) bool {
 			return g.hosts[i].GetIp().IP.Equal(h.GetIp().IP)
 		})

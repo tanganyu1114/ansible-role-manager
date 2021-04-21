@@ -19,7 +19,10 @@ type inventory struct {
 	groups map[string]Group
 }
 
-// TODO: build Inventory Object
+func newInventory(groups map[string]Group) Inventory {
+	inv := &inventory{groups: groups}
+	return Inventory(inv)
+}
 
 func (i *inventory) AddHostToGroup(groupName string, hosts ...Host) {
 	var g Group
@@ -42,7 +45,14 @@ func (i *inventory) RenewGroupName(oldName, newName string) error {
 	if _, has := i.groups[newName]; has {
 		return fmt.Errorf("duplicate group name %s", newName)
 	}
-	return i.groups[oldName].setName(newName)
+	g := i.groups[oldName]
+	err := g.setName(newName)
+	if err != nil {
+		return err
+	}
+	i.RemoveGroup(oldName)
+	i.AddHostToGroup(newName, g.GetHosts()...)
+	return nil
 }
 
 func (i *inventory) RemoveHostFromGroup(groupName string, hosts ...Host) {
