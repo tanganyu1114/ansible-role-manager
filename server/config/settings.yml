@@ -23,22 +23,22 @@ settings:
     enableddb: false
   jwt:
     # token 密钥，生产环境时及的修改
-    secret: go-admin
+    secret: ansible-role-manager
     # token 过期时间 单位：秒
     timeout: 3600
   database:
     # 数据库类型 mysql，sqlite3， postgres
     driver: mysql
     # 数据库连接字符串 mysql 缺省信息 charset=utf8&parseTime=True&loc=Local&timeout=1000ms
-    source: user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+    source: root:123456@tcp(127.0.0.1:3306)/ansible?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
     registers:
       - sources:
-          - user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+          - root:123456@tcp(127.0.0.1:3306)/ansible?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
   gen:
     # 代码生成读取的数据库名称
-    dbname: dbname
+    dbname: ansible
     # 代码生成是使用前端代码存放位置，需要指定到src文件夹，相对路径
-    frontpath: ../go-admin-ui/src
+    frontpath: ../web/src
   extend: # 扩展项使用说明
     demo:
       name: data
