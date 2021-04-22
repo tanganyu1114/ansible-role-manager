@@ -17,6 +17,19 @@ type inventoryFileStorage struct {
 	parser InventoryFileParser
 }
 
+func newInventoryFileStorage(dirPath string, parser InventoryFileParser) InventoryStorage {
+	storage := &inventoryFileStorage{
+		dir:    dirPath,
+		parser: parser,
+	}
+	return InventoryStorage(storage)
+}
+
+func NewInventoryFileStorage(dirPath string) InventoryStorage {
+	parser := NewInventoryFileParser()
+	return newInventoryFileStorage(dirPath, parser)
+}
+
 func (i inventoryFileStorage) Load() (Inventory, error) {
 	err := i.checkDir()
 	if err != nil {

@@ -2,8 +2,6 @@ package inventory
 
 import (
 	"fmt"
-	"net"
-	"sort"
 )
 
 type Inventory interface {
@@ -30,9 +28,15 @@ func (i *inventory) AddHostToGroup(groupName string, hosts ...Host) {
 		g = i.groups[groupName]
 	} else {
 		g = newGroup()
+		err := g.setName(groupName)
+		if err != nil {
+			// todo: log
+			return
+		}
 	}
 	err := g.addHost(hosts...)
 	if err != nil {
+		// todo: log
 		return
 	}
 	i.groups[groupName] = g
@@ -46,10 +50,10 @@ func (i *inventory) RenewGroupName(oldName, newName string) error {
 		return fmt.Errorf("duplicate group name %s", newName)
 	}
 	g := i.groups[oldName]
-	err := g.setName(newName)
-	if err != nil {
-		return err
-	}
+	//err := g.setName(newName)
+	//if err != nil {
+	//	return err
+	//}
 	i.RemoveGroup(oldName)
 	i.AddHostToGroup(newName, g.GetHosts()...)
 	return nil
@@ -68,29 +72,16 @@ func (i *inventory) RemoveGroup(groupName string) {
 }
 
 func (i inventory) GetAllHosts() []Host {
-	hosts := make([]Host, 0)
+	groupAll := newGroup()
 	for _, g := range i.groups {
-		for _, h := range g.GetHosts() {
-			idx := sort.Search(len(hosts), func(j int) bool {
-				return hosts[j].GetIp().IP.Equal(h.GetIp().IP)
-			})
-			if idx < len(hosts) && hosts[idx].GetIp().IP.Equal(h.GetIp().IP) {
-				continue
-			}
-			hosts = append(hosts, h)
-			sort.Slice(hosts, func(x, y int) bool {
-				xIPv4 := hosts[x].GetIp().IP.To4()
-				yIPv4 := hosts[y].GetIp().IP.To4()
-				for j := 0; j < net.IPv4len; j++ {
-					if xIPv4[j] < yIPv4[j] {
-						return true
-					}
-				}
-				return false
-			})
-		}
+		_ = groupAll.addHost(g.GetHosts()...)
+		// todo: handle error
+		//err := groupAll.addHost(g.GetHosts()...)
+		//if err != nil {
+		//	fmt.Printf("get hosts from group %s failed, cased by: %s\n", g.GetName(), err)
+		//}
 	}
-	return hosts
+	return groupAll.GetHosts()
 }
 
 func (i inventory) GetGroups() map[string]Group {
