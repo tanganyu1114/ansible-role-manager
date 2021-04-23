@@ -1,7 +1,6 @@
 package inventory
 
 import (
-	"errors"
 	"fmt"
 	"github.com/tanganyu1114/ansible-role-manager/config"
 	"os"
@@ -111,9 +110,9 @@ func (i inventoryFileStorage) findFiles() ([]string, error) {
 		filePaths = append(filePaths[:j], filePaths[j+1:]...)
 	}
 
-	if len(filePaths) == 0 {
-		err = errors.New("no matching to inventory file")
-	}
+	//if len(filePaths) == 0 {
+	//	err = errors.New("no matching to inventory file")
+	//}
 
 	return filePaths, err
 }

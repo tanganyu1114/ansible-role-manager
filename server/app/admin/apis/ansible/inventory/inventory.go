@@ -6,6 +6,7 @@ import (
 	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 	svc "github.com/tanganyu1114/ansible-role-manager/pkg/inventory"
 	"net/http"
+	"strings"
 )
 
 type Inventory interface {
@@ -35,11 +36,17 @@ func NewInventoryApi() (Inventory, error) {
 }
 
 func (i *inventory) AddHostToGroup(c *gin.Context) {
-	groupName, isExist := c.GetPostForm("group_name")
-	if !isExist {
+	// method:POST location: /groups/:group
+	groupName := c.Param("group")
+	if strings.TrimSpace(groupName) == "" {
 		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
 		return
 	}
+	//groupName, isExist := c.GetPostForm("group_name")
+	//if !isExist {
+	//	i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+	//	return
+	//}
 	hostsStr, isExist := c.GetPostFormArray("hosts")
 	if !isExist {
 		i.Error(c, http.StatusBadRequest, errors.New("hosts is null"), "请求的表单不存在hosts")
@@ -72,16 +79,27 @@ func (i *inventory) AddHostToGroup(c *gin.Context) {
 }
 
 func (i *inventory) RenewGroupName(c *gin.Context) {
-	oldGroupName, isExist := c.GetPostForm("old_group_name")
-	if !isExist {
+	// method: PATCH location: /groups/:group
+	oldGroupName := c.Param("group")
+	if strings.TrimSpace(oldGroupName) == "" {
 		i.Error(c, http.StatusBadRequest, errors.New("old group name is null"), "请求的表单不存在old_group_name")
 		return
 	}
-	newGroupName, isExist := c.GetPostForm("new_group_name")
-	if !isExist {
+	//oldGroupName, isExist := c.GetPostForm("old_group_name")
+	//if !isExist {
+	//	i.Error(c, http.StatusBadRequest, errors.New("old group name is null"), "请求的表单不存在old_group_name")
+	//	return
+	//}
+	newGroupName := c.Param("new_group_name")
+	if strings.TrimSpace(newGroupName) == "" {
 		i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的表单不存在new_group_name")
 		return
 	}
+	//newGroupName, isExist := c.GetPostForm("new_group_name")
+	//if !isExist {
+	//	i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的表单不存在new_group_name")
+	//	return
+	//}
 
 	err := i.bo.RenewGroupName(oldGroupName, newGroupName)
 	if err != nil {
@@ -97,11 +115,17 @@ func (i *inventory) RenewGroupName(c *gin.Context) {
 }
 
 func (i *inventory) RemoveHostFromGroup(c *gin.Context) {
-	groupName, isExist := c.GetPostForm("group_name")
-	if !isExist {
+	// method: POST location: /groups/remove/:group/hosts
+	groupName := c.Param("group")
+	if strings.TrimSpace(groupName) == "" {
 		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
 		return
 	}
+	//groupName, isExist := c.GetPostForm("group_name")
+	//if !isExist {
+	//	i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+	//	return
+	//}
 	hostsStr, isExist := c.GetPostFormArray("hosts")
 	if !isExist {
 		i.Error(c, http.StatusBadRequest, errors.New("hosts is null"), "请求的表单不存在hosts")
@@ -134,11 +158,17 @@ func (i *inventory) RemoveHostFromGroup(c *gin.Context) {
 }
 
 func (i *inventory) RemoveGroupByName(c *gin.Context) {
-	groupName, isExist := c.GetPostForm("group_name")
-	if !isExist {
+	// method: DELETE location: /groups/:group
+	groupName := c.Param("group")
+	if strings.TrimSpace(groupName) == "" {
 		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
 		return
 	}
+	//groupName, isExist := c.GetPostForm("group_name")
+	//if !isExist {
+	//	i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+	//	return
+	//}
 
 	i.bo.RemoveGroup(groupName)
 	err := i.save()
@@ -150,6 +180,7 @@ func (i *inventory) RemoveGroupByName(c *gin.Context) {
 }
 
 func (i *inventory) GetAllHosts(c *gin.Context) {
+	// method: GET location: /hosts
 	hConverter := newHostVOConverter()
 	hostsVO := make([]Host, 0)
 	for _, hostBO := range i.bo.GetAllHosts() {
@@ -160,6 +191,7 @@ func (i *inventory) GetAllHosts(c *gin.Context) {
 }
 
 func (i *inventory) GetGroups(c *gin.Context) {
+	// method: GET location: /groups
 	gConverter := newGroupVOConverter()
 	groupsVO := make(map[string]Group)
 	for groupName, groupBO := range i.bo.GetGroups() {
