@@ -21,6 +21,19 @@ type group struct {
 	hosts     []Host
 }
 
+func NewGroup(groupName string, hosts []Host) (Group, error) {
+	g := newGroup()
+	err := g.setName(groupName)
+	if err != nil {
+		return nil, err
+	}
+	err = g.addHost(hosts...)
+	if err != nil {
+		return nil, err
+	}
+	return g, nil
+}
+
 func newGroup() Group {
 	g := &group{hosts: make([]Host, 0)}
 	return Group(g)

@@ -1,8 +1,10 @@
 package inventory
 
-import "testing"
+import (
+	"testing"
+)
 
-func Test_inventory_RenewGroupName(t *testing.T) {
+func testGroupExample() map[string]Group {
 	group1 := newGroup()
 	group2 := newGroup()
 	_ = group1.setName("test-group")
@@ -12,6 +14,133 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 	groups := make(map[string]Group)
 	groups[group1.GetName()] = group1
 	groups[group2.GetName()] = group2
+	return groups
+}
+
+func Test_inventory_AddHostToGroup(t *testing.T) {
+	type fields struct {
+		groups map[string]Group
+	}
+	type args struct {
+		groupName string
+		hosts     []Host
+	}
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		addFailed bool
+	}{
+		{
+			name:   "add host to exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group",
+				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 1, 2})},
+			},
+		},
+		{
+			name:   "add hosts to exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group1",
+				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 2, 2}), NewIPv4Host([4]byte{10, 2, 0, 2})},
+			},
+		},
+		{
+			name:   "add host to not exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group3",
+				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 3, 1})},
+			},
+		},
+		{
+			name:   "add hosts to not exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group4",
+				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 4, 1}), NewIPv4Host([4]byte{10, 4, 0, 1})},
+			},
+		},
+		{
+			name:   "add nil host to exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group",
+				hosts:     []Host{nil},
+			},
+			addFailed: true,
+		},
+		{
+			name:   "add nil hosts to exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group",
+				hosts:     nil,
+			},
+			addFailed: true,
+		},
+		{
+			name:   "add null host to exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group",
+				hosts:     []Host{},
+			},
+			addFailed: true,
+		},
+
+		{
+			name:   "add nil host to not exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group3",
+				hosts:     []Host{nil},
+			},
+			addFailed: true,
+		},
+		{
+			name:   "add nil hosts to not exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group3",
+				hosts:     nil,
+			},
+			addFailed: true,
+		},
+		{
+			name:   "add null host to not exist group",
+			fields: fields{groups: testGroupExample()},
+			args: args{
+				groupName: "test-group3",
+				hosts:     []Host{},
+			},
+			addFailed: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &inventory{
+				groups: tt.fields.groups,
+			}
+			var bLen, aLen int
+			if _, has := i.GetGroups()[tt.args.groupName]; has {
+				bLen = i.GetGroups()[tt.args.groupName].HostsLen()
+			}
+			i.AddHostToGroup(tt.args.groupName, tt.args.hosts...)
+			if _, has := i.GetGroups()[tt.args.groupName]; has {
+				aLen = i.GetGroups()[tt.args.groupName].HostsLen()
+			}
+			if (bLen >= aLen) != tt.addFailed {
+				t.Errorf("AddHostToGroup() add failed, before lenghth = %d, after lenghth = %d", bLen, aLen)
+			}
+		})
+	}
+}
+
+func Test_inventory_RenewGroupName(t *testing.T) {
+	groups := testGroupExample()
 	type fields struct {
 		groups map[string]Group
 	}

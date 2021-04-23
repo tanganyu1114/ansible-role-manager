@@ -9,8 +9,12 @@ var ExtConfig Extand
 // 使用方法： config.ExtConfig......即可！！
 type Extand struct {
 	// Demo Demo   // 这里配置对应配置文件的结构即可
+	Ansible Ansible
 }
 
-type Demo struct {
-	Name string
+type Ansible struct {
+	BaseDir      string
+	InventoryDir string
+	RoleDir      string
+	PlaybookDir  string
 }

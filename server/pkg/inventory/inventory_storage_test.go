@@ -19,15 +19,7 @@ import (
 
 func Test_inventoryFileStorage_Load(t *testing.T) {
 	dir := "../../test/pkg/inventory/inventory_storage/inventory"
-	group1 := newGroup()
-	group2 := newGroup()
-	_ = group1.setName("test-group")
-	_ = group2.setName("test-group2")
-	_ = group1.addHost(NewIPv4Host([4]byte{192, 168, 0, 1}), NewIPv4Host([4]byte{10, 1, 0, 1}))
-	_ = group2.addHost(NewIPv4Host([4]byte{192, 168, 1, 1}), NewIPv4Host([4]byte{10, 2, 0, 1}))
-	groups := make(map[string]Group)
-	groups[group1.GetName()] = group1
-	groups[group2.GetName()] = group2
+	groups := testGroupExample()
 	type fields struct {
 		dir    string
 		parser InventoryFileParser
@@ -107,15 +99,7 @@ func Test_inventoryFileStorage_Load(t *testing.T) {
 
 func Test_inventoryFileStorage_Save(t *testing.T) {
 	dir := "../../test/pkg/inventory/inventory_storage/inventory"
-	group1 := newGroup()
-	group2 := newGroup()
-	_ = group1.setName("test-group")
-	_ = group2.setName("test-group2")
-	_ = group1.addHost(NewIPv4Host([4]byte{192, 168, 0, 1}), NewIPv4Host([4]byte{10, 1, 0, 1}))
-	_ = group2.addHost(NewIPv4Host([4]byte{192, 168, 1, 1}), NewIPv4Host([4]byte{10, 2, 0, 1}))
-	groups := make(map[string]Group)
-	groups[group1.GetName()] = group1
-	groups[group2.GetName()] = group2
+	groups := testGroupExample()
 	type fields struct {
 		dir    string
 		parser InventoryFileParser
