@@ -91,34 +91,46 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="IP地址" prop="ipAddrs">
+              <el-form-item label="IP地址" prop="inputIp">
                 <el-tag
-                  v-for="tag in dynamicTags"
-                  :key="tag"
+                  v-for="ip in ipAddrs"
+                  :key="ip"
                   closable
                   :disable-transitions="false"
-                  @close="handleClose(tag)"
+                  @close="handleClose(ip)"
                 >
-                  {{ tag }}
+                  {{ ip }}
                 </el-tag>
                 <el-input
                   v-if="inputVisible"
                   ref="saveTagInput"
-                  v-model="inputValue"
-                  class="input-new-tag"
+                  v-model="inputIp"
+                  class="input-ip"
                   size="medium"
                   @keyup.enter.native="$event.target.blur"
                   @blur="handleInputConfirm"
                 />
-                <el-button v-else class="button-new-tag" @click="showInput">+ IP地址</el-button>
+                <el-button v-else class="btn-input-ip" @click="showInput">+ IP地址</el-button>
               </el-form-item>
 
             </el-col>
           </el-row>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-row>
+            <el-col :span="16">
+              <el-alert
+                title="IP地址示例:10.1.1.10,10.1.1.[10:254]"
+                type="info"
+                :closable="false"
+                show-icon
+              />
+            </el-col>
+            <el-col :span="8">
+              <el-button type="primary" @click="submitForm">确 定</el-button>
+              <el-button @click="cancel">取 消</el-button>
+            </el-col>
+          </el-row>
         </div>
       </el-dialog>
     </template>
@@ -126,6 +138,8 @@
 </template>
 
 <script>
+import { getInventoryInfo, getAllIpaddr, addInventoryInfo, updateInventoryInfo, deleteInventoryInfo } from '@/api/ansible-inventory'
+
 export default {
   name: 'Inventory',
   data() {
@@ -144,9 +158,9 @@ export default {
       open: false,
       form: {},
       // 动态tag数据信息
-      dynamicTags: [],
+      ipAddrs: [],
       inputVisible: false,
-      inputValue: '',
+      inputIp: '',
       // 表格数据信息
       tableData: [],
       // 查询参数
@@ -164,6 +178,14 @@ export default {
     }
   },
   created() {
+    (function getAllInfo() {
+      const Ips = getAllIpaddr()
+      // const Gps = getInventoryInfo()
+      const data = {}
+      data.groupName = 'all'
+      data.ipAddrs = Ips
+      this.tableData.push(data)
+    }())
   },
   methods: {
     handleAdd() {
@@ -171,6 +193,7 @@ export default {
       this.open = true
     },
     handleUpdate() {
+      this.title = '修改inventory'
       this.open = true
     },
     handleDelete() {
@@ -179,6 +202,7 @@ export default {
     // dialog弹窗函数
     submitForm() {
       // TODO
+      alert('form:' + this.form + 'ipaddr:' + this.form.ipAddrs + 'groupname:' + this.form.groupName)
     },
     cancel() {
       this.open = false
@@ -186,7 +210,7 @@ export default {
     },
     // 动态tag函数信息
     handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      this.ipAddrs.splice(this.ipAddrs.indexOf(tag), 1)
     },
 
     showInput() {
@@ -197,14 +221,14 @@ export default {
     },
 
     handleInputConfirm() {
-      const inputValue = this.inputValue
-      if (this.validateIpaddr(inputValue)) {
-        this.dynamicTags.push(inputValue)
+      const inIp = this.inputIp
+      if (this.validateIpaddr(inIp)) {
+        this.ipAddrs.push(inIp)
       } else {
         this.$message.error('IP地址格式错误')
       }
       this.inputVisible = false
-      this.inputValue = ''
+      this.inputIp = ''
     },
     // 验证ip地址是否合规
     validateIpaddr(ip) {
@@ -231,14 +255,14 @@ export default {
 .el-tag + .el-tag {
   margin-left: 10px;
 }
-.button-new-tag {
+.btn-input-ip {
   margin-left: 10px;
   height: 32px;
   line-height: 30px;
   padding-top: 0;
   padding-bottom: 0;
 }
-.input-new-tag {
+.input-ip {
   width: 150px;
   margin-left: 10px;
   vertical-align: bottom;
