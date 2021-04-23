@@ -21,7 +21,7 @@ func registerAnsibleInventoryRouter(v1 *gin.RouterGroup, authMiddleware *jwt.Gin
 	{
 		r.POST("/groups/:group", api.AddHostToGroup)
 		r.PATCH("/groups/:group", api.RenewGroupName)
-		r.POST("/groups/remove/:group/hosts", api.RemoveHostFromGroup)
+		r.POST("/groups/:group/remove", api.RemoveHostFromGroup)
 		r.DELETE("/groups/:group", api.RemoveGroupByName)
 		r.GET("/hosts", api.GetAllHosts)
 		r.GET("/groups", api.GetGroups)

@@ -39,7 +39,7 @@ func (i *inventory) AddHostToGroup(c *gin.Context) {
 	// method:POST location: /groups/:group
 	groupName := c.Param("group")
 	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
 		return
 	}
 	//groupName, isExist := c.GetPostForm("group_name")
@@ -82,7 +82,7 @@ func (i *inventory) RenewGroupName(c *gin.Context) {
 	// method: PATCH location: /groups/:group
 	oldGroupName := c.Param("group")
 	if strings.TrimSpace(oldGroupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("old group name is null"), "请求的表单不存在old_group_name")
+		i.Error(c, http.StatusNotFound, errors.New("old group name is null"), "指定的group为空")
 		return
 	}
 	//oldGroupName, isExist := c.GetPostForm("old_group_name")
@@ -90,11 +90,16 @@ func (i *inventory) RenewGroupName(c *gin.Context) {
 	//	i.Error(c, http.StatusBadRequest, errors.New("old group name is null"), "请求的表单不存在old_group_name")
 	//	return
 	//}
-	newGroupName := c.Param("new_group_name")
-	if strings.TrimSpace(newGroupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的表单不存在new_group_name")
+	newGroupName, isExist := c.GetQuery("new_group_name")
+	if !isExist || strings.TrimSpace(newGroupName) == "" {
+		i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的参数new_group_name为空")
 		return
 	}
+	//newGroupName := c.Param("new_group_name")
+	//if strings.TrimSpace(newGroupName) == "" {
+	//	i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的表单不存在new_group_name")
+	//	return
+	//}
 	//newGroupName, isExist := c.GetPostForm("new_group_name")
 	//if !isExist {
 	//	i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的表单不存在new_group_name")
@@ -118,7 +123,7 @@ func (i *inventory) RemoveHostFromGroup(c *gin.Context) {
 	// method: POST location: /groups/remove/:group/hosts
 	groupName := c.Param("group")
 	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
 		return
 	}
 	//groupName, isExist := c.GetPostForm("group_name")
@@ -161,7 +166,7 @@ func (i *inventory) RemoveGroupByName(c *gin.Context) {
 	// method: DELETE location: /groups/:group
 	groupName := c.Param("group")
 	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("group name is null"), "请求的表单不存在group_name")
+		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
 		return
 	}
 	//groupName, isExist := c.GetPostForm("group_name")
