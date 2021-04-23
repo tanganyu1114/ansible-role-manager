@@ -3,8 +3,15 @@ package inventory
 import (
 	"errors"
 	"fmt"
+	"github.com/tanganyu1114/ansible-role-manager/config"
 	"os"
 	"path/filepath"
+	"sync"
+)
+
+var (
+	singletonInventoryStorageIns InventoryStorage
+	onceForInventoryStorageIns   = sync.Once{}
 )
 
 type InventoryStorage interface {
@@ -25,9 +32,15 @@ func newInventoryFileStorage(dirPath string, parser InventoryFileParser) Invento
 	return InventoryStorage(storage)
 }
 
-func NewInventoryFileStorage(dirPath string) InventoryStorage {
-	parser := NewInventoryFileParser()
-	return newInventoryFileStorage(dirPath, parser)
+func GetSingletonInventoryFileStorageIns() InventoryStorage {
+	onceForInventoryStorageIns.Do(func() {
+		if singletonInventoryStorageIns == nil {
+			dirPath := filepath.Join(config.ExtConfig.Ansible.BaseDir, config.ExtConfig.Ansible.InventoryDir)
+			parser := NewInventoryFileParser()
+			singletonInventoryStorageIns = newInventoryFileStorage(dirPath, parser)
+		}
+	})
+	return singletonInventoryStorageIns
 }
 
 func (i inventoryFileStorage) Load() (Inventory, error) {

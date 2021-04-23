@@ -5,7 +5,6 @@ import (
 	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
 	"github.com/tanganyu1114/ansible-role-manager/app/admin/apis/ansible/inventory"
 	"github.com/tanganyu1114/ansible-role-manager/common/middleware"
-	"github.com/tanganyu1114/ansible-role-manager/config"
 )
 
 func init() {
@@ -14,7 +13,7 @@ func init() {
 
 // 需认证的路由代码
 func registerAnsibleInventoryRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api, err := inventory.NewInventoryApi(config.ExtConfig.Ansible.InventoryDir)
+	api, err := inventory.NewInventoryApi()
 	if err != nil {
 		panic(err)
 	}
