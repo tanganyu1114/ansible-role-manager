@@ -13,10 +13,7 @@ func init() {
 
 // 需认证的路由代码
 func registerAnsibleInventoryRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api, err := inventory.NewInventoryApi()
-	if err != nil {
-		panic(err)
-	}
+	api := inventory.NewInventoryApi()
 	r := v1.Group("/ansible/inventory").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
 		r.POST("/groups/:group", api.AddHostToGroup)

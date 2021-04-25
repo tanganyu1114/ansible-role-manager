@@ -31,7 +31,7 @@ func newInventoryFileStorage(dirPath string, parser InventoryFileParser) Invento
 	return InventoryStorage(storage)
 }
 
-func GetSingletonInventoryFileStorageIns() InventoryStorage {
+func GetSingletonInventoryStorageIns() InventoryStorage {
 	onceForInventoryStorageIns.Do(func() {
 		if singletonInventoryStorageIns == nil {
 			dirPath := filepath.Join(config.ExtConfig.Ansible.BaseDir, config.ExtConfig.Ansible.InventoryDir)
@@ -64,7 +64,8 @@ func (i inventoryFileStorage) Load() (Inventory, error) {
 			continue
 		}
 		if _, has := groups[g.GetName()]; !has {
-			groups[g.GetName()] = newGroup()
+			groups[g.GetName()] = g
+			continue
 		}
 		_ = groups[g.GetName()].addHost(g.GetHosts()...)
 	}
