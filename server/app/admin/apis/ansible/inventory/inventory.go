@@ -39,9 +39,9 @@ func (i *inventory) AddHostToGroup(c *gin.Context) {
 		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
 		return
 	}
-	hostsStr, isExist := c.GetPostFormArray("hosts")
+	hostsStr, isExist := c.GetPostFormArray("ipAddrs")
 	if !isExist {
-		i.Error(c, http.StatusBadRequest, errors.New("hosts is null"), "请求的表单不存在hosts")
+		i.Error(c, http.StatusBadRequest, errors.New("ipAddrs is null"), "请求的表单不存在hosts")
 		return
 	}
 
@@ -97,9 +97,9 @@ func (i *inventory) RemoveHostFromGroup(c *gin.Context) {
 		return
 	}
 
-	hostsStr, isExist := c.GetPostFormArray("hosts")
+	hostsStr, isExist := c.GetPostFormArray("ipAddrs")
 	if !isExist {
-		i.Error(c, http.StatusBadRequest, errors.New("hosts is null"), "请求的表单不存在hosts")
+		i.Error(c, http.StatusBadRequest, errors.New("ipAddrs is null"), "请求的表单不存在hosts")
 		return
 	}
 

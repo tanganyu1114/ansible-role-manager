@@ -41,7 +41,7 @@ settings:
     frontpath: ../web/src
   extend: # 扩展项使用说明
     ansible:
-      basedir: .
+      basedir: E:\Golang\src\ansible-role-manager\test
       inventorydir: inventory
       roledir: role
       playbook: playbook

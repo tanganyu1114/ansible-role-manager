@@ -35,24 +35,34 @@
         </el-row>
         <!-- 表格信息 -->
         <el-table
-          :data="tableData"
+          v-loading="loading"
+          :data="inventoryList"
           style="width: 100%"
+          height="250"
+          border
+          @selection-change="handleSelectionChange"
         >
-          <el-table-column
-            type="index"
-            width="100"
-          />
-          <el-table-column
-            label="组名"
-            prop="groupName"
-            width="200"
-          />
-          <el-table-column
-            label="IP地址"
-            width="500"
-            prop="ipAddrs"
-          />
-          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+
+          <el-table-column type="selection" width="55" align="center" />
+          <el-table-column type="index" label="序号" width="55" align="center" />
+          <el-table-column label="组名" prop="groupName" align="center" width="200">
+            <template slot-scope="scope">
+              <el-tag type="success">
+                {{ scope.row.groupName }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="IP地址" prop="ipAddrs">
+            <template slot-scope="scope">
+              <el-tag
+                v-for="ip in scope.row.ipAddrs"
+                :key="ip"
+              >
+                {{ ip }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
                 v-permisaction="['ansible:inventory:edit']"
@@ -74,7 +84,6 @@
           </el-table-column>
         </el-table>
         <pagination
-          v-show="total>10"
           :total="total"
           :page.sync="queryParams.pageIndex"
           :limit.sync="queryParams.pageSize"
@@ -162,7 +171,7 @@ export default {
       inputVisible: false,
       inputIp: '',
       // 表格数据信息
-      tableData: [],
+      inventoryList: [],
       // 查询参数
       total: 0,
       queryParams: {
@@ -178,22 +187,39 @@ export default {
     }
   },
   created() {
-    (function getAllInfo() {
-      const Ips = getAllIpaddr()
-      // const Gps = getInventoryInfo()
-      const data = {}
-      data.groupName = 'all'
-      data.ipAddrs = Ips
-      this.tableData.push(data)
-    }())
+    this.getList()
+  },
+  mounted() {
+    // 挂载阶段
   },
   methods: {
+    getList() {
+      getAllIpaddr().then(response => {
+        const Ips = response.data
+        console.log(Ips)
+        const data = {}
+        data.groupName = 'all'
+        data.ipAddrs = Ips
+        this.inventoryList.push(data)
+      })
+      getInventoryInfo().then(response => {
+        const Gps = response.data
+        console.log(Gps)
+        for (const data of Object.values(Gps)) {
+          console.log(data)
+          this.inventoryList.push(data)
+        }
+      })
+      this.loading = false
+    },
     handleAdd() {
       this.title = '新增inventory'
       this.open = true
     },
-    handleUpdate() {
+    handleUpdate(row) {
       this.title = '修改inventory'
+      this.form.groupName = row.groupName || this.ids
+      this.ipAddrs = row.ipAddrs
       this.open = true
     },
     handleDelete() {
@@ -236,16 +262,11 @@ export default {
       const reg2 = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.\[(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]):(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])]$/
       return reg1.test(ip) || reg2.test(ip)
     },
-
-    // 表格函数
-    getList() {
-      this.loading = true
-      /*      listSalaryTable(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-          this.salarytableList = response.data.list
-          this.total = response.data.count
-          this.loading = false
-        }
-      )*/
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.groupName)
+      this.single = selection.length !== 1
+      this.multiple = !selection.length
     }
   }
 }

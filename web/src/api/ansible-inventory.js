@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取全部互信主机ip信息
 export function getAllIpaddr() {
   return request({
-    url: '/api/v1/getAllIpaddr',
+    url: '/api/v1/ansible/inventory/hosts',
     method: 'get'
   })
 }
@@ -11,7 +11,7 @@ export function getAllIpaddr() {
 // 获取inventory全部信息
 export function getInventoryInfo() {
   return request({
-    url: '/api/v1/getInventoryInfo',
+    url: '/api/v1/ansible/inventory/groups',
     method: 'get'
   })
 }
