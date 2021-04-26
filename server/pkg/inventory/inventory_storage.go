@@ -79,6 +79,18 @@ func (i inventoryFileStorage) Save(inv Inventory) error {
 	if err != nil {
 		return err
 	}
+
+	// 清理TruncatedGroup
+	for tGName, isTruncated := range inv.getTruncatedGroup() {
+		if isTruncated {
+			err = os.Remove(filepath.Join(i.dir, tGName))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// 保存配置
 	for gName, g := range inv.GetGroups() {
 		b, err := i.parser.Dump(g)
 		if err != nil {
