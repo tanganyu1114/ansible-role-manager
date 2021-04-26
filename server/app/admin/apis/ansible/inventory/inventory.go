@@ -2,188 +2,114 @@ package inventory
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 	svc "github.com/tanganyu1114/ansible-role-manager/pkg/inventory"
-	"net/http"
-	"strings"
 	"sync"
 )
 
 type Inventory interface {
-	AddHostToGroup(c *gin.Context)
-	RenewGroupName(c *gin.Context)
-	RemoveHostFromGroup(c *gin.Context)
-	RemoveGroupByName(c *gin.Context)
-	GetAllHosts(c *gin.Context)
-	GetGroups(c *gin.Context)
+	AddHostToGroup(groupName string, hosts ...Host) error
+	RenewGroupName(oldName, newName string) error
+	RemoveHostFromGroup(groupName string, hosts ...Host) error
+	RemoveGroup(groupName string) error
+	GetAllHosts() []Host
+	GetGroups() map[string]Group
 }
 
 type inventory struct {
-	apis.Api
 	sync.RWMutex
-	//bo svc.Inventory
 }
 
-func NewInventoryApi() Inventory {
-	invVO := &inventory{
-		RWMutex: sync.RWMutex{},
-	}
+func newInventory() Inventory {
+	invVO := &inventory{RWMutex: sync.RWMutex{}}
 	return Inventory(invVO)
 }
 
-
-func (i *inventory) AddHostToGroup(c *gin.Context) {
-
-	// method:POST location: /groups/:group
-	groupName := c.Param("group")
-	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
-		return
+func (i *inventory) AddHostToGroup(groupName string, hosts ...Host) error {
+	if hosts == nil || len(hosts) == 0 {
+		return errors.New("hosts are null")
 	}
 
-	group := Group{}
-	if err:= c.ShouldBindJSON(&group);err != nil {
-		i.Error(c, http.StatusConflict, errors.New("invalid format json"),"错误的文本格式")
+	groupVO := Group{
+		GroupName: groupName,
+		Hosts:     hosts,
 	}
-/*	hostsStr, isExist := c.GetPostFormArray("form.ipAddrs")
-	if !isExist {
-		i.Error(c, http.StatusBadRequest, errors.New("ipAddrs is null"), "请求的表单不存在hosts")
-		return
-	}
-*/
-/*	hostsC := newHostsVOConverter()
-	hostsBO, err := hostsC.ConvertToBOFromString()
+	groupC := newGroupVOConverter()
+	groupBO, err := groupC.ConvertToBO(groupVO)
 	if err != nil {
-		i.Error(c, http.StatusBadRequest, err, "请求的表单格式不正确")
-	}*/
-	hostC := newHostVOConverter()
+		return err
+	}
 
-	done := i.boDO(c, true, func(invBO svc.Inventory) (fnDone bool) {
-		for _, hostVO := range group.Hosts {
-			hostBO,err := hostC.ConvertToBO(hostVO)
-			if  err != nil{
-				i.Error(c , http.StatusBadRequest, err,"ipAddrs 格式错误")
-				return
-			}
-			invBO.AddHostToGroup(group.GroupName,hostBO)
-		}
-		return true
+	err = i.boDO(true, func(invBO svc.Inventory) error {
+		invBO.AddHostToGroup(groupBO.GetName(), groupBO.GetHosts()...)
+		return nil
 	})
 
-	if done {
-		i.OK(c, nil, "成功添加主机信息")
-	}
+	return err
 }
 
-func (i *inventory) RenewGroupName(c *gin.Context) {
-	// method: PATCH location: /groups/:group
-	oldGroupName := c.Param("group")
-	if strings.TrimSpace(oldGroupName) == "" {
-		i.Error(c, http.StatusNotFound, errors.New("old group name is null"), "指定的group为空")
-		return
-	}
-
-	newGroupName, isExist := c.GetQuery("new_group_name")
-	if !isExist || strings.TrimSpace(newGroupName) == "" {
-		i.Error(c, http.StatusBadRequest, errors.New("new group name is null"), "请求的参数new_group_name为空")
-		return
-	}
-
-	done := i.boDO(c, true, func(invBO svc.Inventory) (fnDone bool) {
-		err := invBO.RenewGroupName(oldGroupName, newGroupName)
-		if err != nil {
-			i.Error(c, http.StatusBadRequest, err, "参数不规范")
-			return false
-		}
-		return true
+func (i *inventory) RenewGroupName(oldName, newName string) error {
+	err := i.boDO(true, func(invBO svc.Inventory) error {
+		return invBO.RenewGroupName(oldName, newName)
 	})
-
-	if done {
-		i.OK(c, nil, "成功更改组名")
-	}
+	return err
 }
 
-func (i *inventory) RemoveHostFromGroup(c *gin.Context) {
-	// method: POST location: /groups/remove/:group/hosts
-	groupName := c.Param("group")
-	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
-		return
+func (i *inventory) RemoveHostFromGroup(groupName string, hosts ...Host) error {
+	if hosts == nil || len(hosts) == 0 {
+		return errors.New("hosts are null")
 	}
 
-	hostsStr, isExist := c.GetPostFormArray("ipAddrs")
-	if !isExist {
-		i.Error(c, http.StatusBadRequest, errors.New("ipAddrs is null"), "请求的表单不存在hosts")
-		return
+	groupVO := Group{
+		GroupName: groupName,
+		Hosts:     hosts,
 	}
-
-	hostsC := newHostsVOConverter()
-	hostsBO, err := hostsC.ConvertToBOFromString(hostsStr)
+	groupC := newGroupVOConverter()
+	groupBO, err := groupC.ConvertToBO(groupVO)
 	if err != nil {
-		i.Error(c, http.StatusBadRequest, err, "请求的表单格式不正确")
+		return err
 	}
 
-	done := i.boDO(c, true, func(invBO svc.Inventory) (fnDone bool) {
-		invBO.RemoveHostFromGroup(groupName, hostsBO...)
-		return true
+	err = i.boDO(true, func(invBO svc.Inventory) error {
+		invBO.RemoveHostFromGroup(groupBO.GetName(), groupBO.GetHosts()...)
+		return nil
 	})
 
-	if done {
-		i.OK(c, nil, "成功删除主机信息")
-	}
+	return err
 }
 
-func (i *inventory) RemoveGroupByName(c *gin.Context) {
-	// method: DELETE location: /groups/:group
-	groupName := c.Param("group")
-	if strings.TrimSpace(groupName) == "" {
-		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
-		return
-	}
-
-	done := i.boDO(c, true, func(invBO svc.Inventory) (fnDone bool) {
+func (i *inventory) RemoveGroup(groupName string) error {
+	err := i.boDO(true, func(invBO svc.Inventory) error {
 		invBO.RemoveGroup(groupName)
-		return true
+		return nil
 	})
-
-	if done {
-		i.OK(c, nil, "完成操作")
-	}
+	return err
 }
 
-func (i *inventory) GetAllHosts(c *gin.Context) {
-	// method: GET location: /hosts
+func (i *inventory) GetAllHosts() []Host {
 	hostsVO := make([]Host, 0)
-	done := i.boDO(c, false, func(invBO svc.Inventory) (fnDone bool) {
+	_ = i.boDO(false, func(invBO svc.Inventory) error {
 		hostsC := newHostsVOConverter()
-		hostsVO = hostsC.ConvertToVO(invBO.GetAllHosts())
-		return true
+		hostsBO := invBO.GetAllHosts()
+		hostsVO = hostsC.ConvertToVO(hostsBO)
+		return nil
 	})
-
-	if done {
-		i.OK(c, hostsVO, "成功查询所有主机信息")
-	}
+	return hostsVO
 }
 
-func (i *inventory) GetGroups(c *gin.Context) {
-	// method: GET location: /groups
+func (i *inventory) GetGroups() map[string]Group {
 	groupsVO := make(map[string]Group)
-	done := i.boDO(c, false, func(invBO svc.Inventory) (fnDone bool) {
-		gConverter := newGroupVOConverter()
-		for groupName, groupBO := range invBO.GetGroups() {
-			groupVO := gConverter.ConvertToVO(groupBO)
-			groupsVO[groupName] = groupVO
+	groupC := newGroupVOConverter()
+	_ = i.boDO(false, func(invBO svc.Inventory) error {
+		groupsBO := invBO.GetGroups()
+		for s, groupBO := range groupsBO {
+			groupsVO[s] = groupC.ConvertToVO(groupBO)
 		}
-		return true
+		return nil
 	})
-
-	if done {
-		i.OK(c, groupsVO, "成功查询所有组信息")
-	}
+	return groupsVO
 }
 
-func (i *inventory) boDO(c *gin.Context, needSave bool, doFn func(invBO svc.Inventory) (fnDone bool)) bool {
+func (i *inventory) boDO(needSave bool, doFn func(invBO svc.Inventory) error) error {
 	if needSave {
 		i.Lock()
 		defer i.Unlock()
@@ -195,23 +121,20 @@ func (i *inventory) boDO(c *gin.Context, needSave bool, doFn func(invBO svc.Inve
 	storageBO := svc.GetSingletonInventoryStorageIns()
 	invBO, err := storageBO.Load()
 	if err != nil {
-		i.Error(c, http.StatusInternalServerError, err, "读取配置失败")
-		return false
+		return err
 	}
 
-	isDone := doFn(invBO)
-	if !isDone {
-		return false
+	err = doFn(invBO)
+	if err != nil {
+		return err
 	}
 
 	if needSave {
 		err = storageBO.Save(invBO)
 		if err != nil {
-			i.Error(c, http.StatusInternalServerError, err, "保存配置失败")
-			return false
+			return err
 		}
-		return true
 	}
 
-	return true
+	return nil
 }

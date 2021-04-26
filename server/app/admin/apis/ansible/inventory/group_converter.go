@@ -17,20 +17,18 @@ func newGroupVOConverter() GroupVOConverter {
 
 func (g groupConverter) ConvertToBO(vo Group) (svc.Group, error) {
 	groupName := vo.GroupName
-	hostsBO := make([]svc.Host, 0)
-	hConverter := newHostVOConverter()
-	for _, hostVO := range vo.Hosts {
-		hostBO, err := hConverter.ConvertToBO(hostVO)
-		if err != nil {
-			return nil, err
-		}
-		hostsBO = append(hostsBO, hostBO)
+
+	hostsC := newHostsVOConverter()
+	hostsBO, err := hostsC.ConvertToBO(vo.Hosts)
+	if err != nil {
+		return nil, err
 	}
 
 	groupBO, err := svc.NewGroup(groupName, hostsBO)
 	if err != nil {
 		return nil, err
 	}
+
 	return groupBO, nil
 }
 
