@@ -10,10 +10,9 @@ import (
 )
 
 type InventoryApi interface {
-	AddHostToGroup(c *gin.Context)
-	RenewGroupName(c *gin.Context)
-	RemoveHostFromGroup(c *gin.Context)
-	RemoveGroupByName(c *gin.Context)
+	NewGroup(c *gin.Context)
+	ModifyGroup(c *gin.Context)
+	DeleteGroup(c *gin.Context)
 	GetAllHosts(c *gin.Context)
 	GetGroups(c *gin.Context)
 }
@@ -35,17 +34,17 @@ func newInventoryApi(vo Inventory) InventoryApi {
 	return InventoryApi(api)
 }
 
-func (i *inventoryApi) AddHostToGroup(c *gin.Context) {
+func (i *inventoryApi) NewGroup(c *gin.Context) {
 	// method:POST location: /groups
 
-	groupVO := Group{}
-	err := c.ShouldBindJSON(&groupVO)
+	req := NewGroupRequestInfo{}
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		i.Error(c, http.StatusBadRequest, err, "错误的文本格式")
 		return
 	}
 
-	err = i.vo.AddHostToGroup(groupVO.GroupName, groupVO.Hosts...)
+	err = i.vo.AddHostToGroup(req.GroupName, req.Hosts...)
 	if err != nil {
 		i.Error(c, http.StatusBadRequest, err, "错误的Group格式")
 		return
@@ -54,48 +53,34 @@ func (i *inventoryApi) AddHostToGroup(c *gin.Context) {
 	i.OK(c, nil, "成功添加主机信息")
 }
 
-func (i *inventoryApi) RenewGroupName(c *gin.Context) {
-	// method: PUT location: /groups
-
-	params := struct {
-		OldName string `json:"oldName"`
-		NewName string `json:"newName"`
-	}{}
-
-	err := c.ShouldBindJSON(&params)
-	if err != nil {
-		i.Error(c, http.StatusBadRequest, err, "错误的文本格式")
-		return
-	}
-
-	err = i.vo.RenewGroupName(params.OldName, params.NewName)
-	if err != nil {
-		i.Error(c, http.StatusBadRequest, err, "错误的参数格式")
-		return
-	}
-
-	i.OK(c, nil, "成功更改组名")
-}
-
-func (i *inventoryApi) RemoveHostFromGroup(c *gin.Context) {
+func (i *inventoryApi) ModifyGroup(c *gin.Context) {
 	// method: PATCH location: /groups
-	groupVO := Group{}
-	err := c.ShouldBindJSON(&groupVO)
+	req := ModifyGroupRequestInfo{}
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		i.Error(c, http.StatusBadRequest, err, "错误的文本格式")
 		return
 	}
-
-	err = i.vo.RemoveHostFromGroup(groupVO.GroupName, groupVO.Hosts...)
-	if err != nil {
-		i.Error(c, http.StatusBadRequest, err, "错误的Group格式")
+	var modifyErr error
+	defer func() {
+		if modifyErr != nil {
+			i.Error(c, http.StatusBadRequest, err, "传参异常，修改失败")
+		}
+	}()
+	modifyErr = i.vo.RemoveGroup(req.TargetGroupName)
+	if modifyErr != nil {
 		return
 	}
 
-	i.OK(c, nil, "成功删除主机信息")
+	modifyErr = i.vo.AddHostToGroup(req.GroupName, req.Hosts...)
+	if modifyErr != nil {
+		return
+	}
+
+	i.OK(c, nil, "成功完成修改")
 }
 
-func (i *inventoryApi) RemoveGroupByName(c *gin.Context) {
+func (i *inventoryApi) DeleteGroup(c *gin.Context) {
 	// method: DELETE location: /groups/:group
 	groupName := c.Param("group")
 	if strings.TrimSpace(groupName) == "" {
@@ -109,7 +94,7 @@ func (i *inventoryApi) RemoveGroupByName(c *gin.Context) {
 		return
 	}
 
-	i.OK(c, nil, "完成操作")
+	i.OK(c, nil, "完成删除操作")
 }
 
 func (i *inventoryApi) GetAllHosts(c *gin.Context) {

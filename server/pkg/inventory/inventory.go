@@ -11,14 +11,19 @@ type Inventory interface {
 	RemoveGroup(groupName string)
 	GetAllHosts() []Host
 	GetGroups() map[string]Group
+	getTruncatedGroup() map[string]bool
 }
 
 type inventory struct {
-	groups map[string]Group
+	groups           map[string]Group
+	isTruncatedGroup map[string]bool
 }
 
 func newInventory(groups map[string]Group) Inventory {
-	inv := &inventory{groups: groups}
+	inv := &inventory{
+		groups:           groups,
+		isTruncatedGroup: make(map[string]bool),
+	}
 	return Inventory(inv)
 }
 
@@ -40,6 +45,7 @@ func (i *inventory) AddHostToGroup(groupName string, hosts ...Host) {
 		return
 	}
 	i.groups[groupName] = g
+	i.isTruncatedGroup[groupName] = false
 }
 
 func (i *inventory) RenewGroupName(oldName, newName string) error {
@@ -68,6 +74,7 @@ func (i *inventory) RemoveHostFromGroup(groupName string, hosts ...Host) {
 func (i *inventory) RemoveGroup(groupName string) {
 	if _, has := i.groups[groupName]; has {
 		delete(i.groups, groupName)
+		i.isTruncatedGroup[groupName] = true
 	}
 }
 
@@ -86,4 +93,14 @@ func (i inventory) GetAllHosts() []Host {
 
 func (i inventory) GetGroups() map[string]Group {
 	return i.groups
+}
+
+func (i *inventory) getTruncatedGroup() map[string]bool {
+	truncatedGroup := make(map[string]bool)
+	for groupName := range i.isTruncatedGroup {
+		if i.isTruncatedGroup[groupName] {
+			truncatedGroup[groupName] = true
+		}
+	}
+	return truncatedGroup
 }
