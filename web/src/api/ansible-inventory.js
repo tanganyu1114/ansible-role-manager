@@ -17,13 +17,14 @@ export function getInventoryInfo() {
 }
 
 // 添加inventory
-export function addInventoryInfo(data) {
+export function addInventoryInfo(group, data) {
   return request({
-    url: '/api/v1/addInventoryInfo',
+    url: '/api/v1/ansible/inventory/groups/' + group,
     method: 'post',
     data: data
   })
 }
+//  headers: { 'Content-Type': 'application/json' }
 
 // 修改inventory
 export function updateInventoryInfo(data) {

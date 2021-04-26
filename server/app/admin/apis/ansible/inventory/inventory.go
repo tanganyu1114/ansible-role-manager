@@ -32,27 +32,42 @@ func NewInventoryApi() Inventory {
 	return Inventory(invVO)
 }
 
+
 func (i *inventory) AddHostToGroup(c *gin.Context) {
+
 	// method:POST location: /groups/:group
 	groupName := c.Param("group")
 	if strings.TrimSpace(groupName) == "" {
 		i.Error(c, http.StatusNotFound, errors.New("group name is null"), "指定的group为空")
 		return
 	}
-	hostsStr, isExist := c.GetPostFormArray("ipAddrs")
+
+	group := Group{}
+	if err:= c.ShouldBindJSON(&group);err != nil {
+		i.Error(c, http.StatusConflict, errors.New("invalid format json"),"错误的文本格式")
+	}
+/*	hostsStr, isExist := c.GetPostFormArray("form.ipAddrs")
 	if !isExist {
 		i.Error(c, http.StatusBadRequest, errors.New("ipAddrs is null"), "请求的表单不存在hosts")
 		return
 	}
-
-	hostsC := newHostsVOConverter()
-	hostsBO, err := hostsC.ConvertToBOFromString(hostsStr)
+*/
+/*	hostsC := newHostsVOConverter()
+	hostsBO, err := hostsC.ConvertToBOFromString()
 	if err != nil {
 		i.Error(c, http.StatusBadRequest, err, "请求的表单格式不正确")
-	}
+	}*/
+	hostC := newHostVOConverter()
 
 	done := i.boDO(c, true, func(invBO svc.Inventory) (fnDone bool) {
-		invBO.AddHostToGroup(groupName, hostsBO...)
+		for _, hostVO := range group.Hosts {
+			hostBO,err := hostC.ConvertToBO(hostVO)
+			if  err != nil{
+				i.Error(c , http.StatusBadRequest, err,"ipAddrs 格式错误")
+				return
+			}
+			invBO.AddHostToGroup(group.GroupName,hostBO)
+		}
 		return true
 	})
 

@@ -38,11 +38,9 @@
           v-loading="loading"
           :data="inventoryList"
           style="width: 100%"
-          height="250"
           border
           @selection-change="handleSelectionChange"
         >
-
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column type="index" label="序号" width="55" align="center" />
           <el-table-column label="组名" prop="groupName" align="center" width="200">
@@ -96,14 +94,15 @@
           <el-row>
             <el-col :span="24">
               <el-form-item label="组名" prop="groupName">
-                <el-input v-model="form.groupName" placeholder="请输入组名" />
+                <el-input v-model.trim="form.groupName" placeholder="请输入组名" />
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="IP地址" prop="inputIp">
                 <el-tag
-                  v-for="ip in ipAddrs"
+                  v-for="ip in form.ipAddrs"
                   :key="ip"
+                  v-model="form.ipAddrs"
                   closable
                   :disable-transitions="false"
                   @close="handleClose(ip)"
@@ -165,7 +164,10 @@ export default {
       multiple: true,
       // 是否显示弹出层
       open: false,
-      form: {},
+      form: {
+        groupName: '',
+        ipAddrs: []
+      },
       // 动态tag数据信息
       ipAddrs: [],
       inputVisible: false,
@@ -206,7 +208,6 @@ export default {
         const Gps = response.data
         console.log(Gps)
         for (const data of Object.values(Gps)) {
-          console.log(data)
           this.inventoryList.push(data)
         }
       })
@@ -228,7 +229,14 @@ export default {
     // dialog弹窗函数
     submitForm() {
       // TODO
-      alert('form:' + this.form + 'ipaddr:' + this.form.ipAddrs + 'groupname:' + this.form.groupName)
+      console.log('form:', this.form)
+      /*      const data = {}
+      data.groupName = this.form.groupName
+      data.ipAddrs = this.form.ipAddrs*/
+      // console.log(data)
+      addInventoryInfo(this.form.groupName, this.form).then(response => {
+        console.log('res:', response)
+      })
     },
     cancel() {
       this.open = false
@@ -249,7 +257,7 @@ export default {
     handleInputConfirm() {
       const inIp = this.inputIp
       if (this.validateIpaddr(inIp)) {
-        this.ipAddrs.push(inIp)
+        this.form.ipAddrs.push(inIp)
       } else {
         this.$message.error('IP地址格式错误')
       }

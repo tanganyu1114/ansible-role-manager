@@ -1,6 +1,6 @@
 package inventory
 
 type Group struct {
-	GroupName string	`json:"groupName"`
-	Hosts     []Host	`json:"ipAddrs"`
+	GroupName string	`form:"groupName" json:"groupName"`
+	Hosts     []Host	`form:"ipAddrs" json:"ipAddrs"`
 }
