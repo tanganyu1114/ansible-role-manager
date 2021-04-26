@@ -17,9 +17,9 @@ export function getInventoryInfo() {
 }
 
 // 添加inventory
-export function addInventoryInfo(group, data) {
+export function addInventoryInfo(data) {
   return request({
-    url: '/api/v1/ansible/inventory/groups/' + group,
+    url: '/api/v1/ansible/inventory/groups',
     method: 'post',
     data: data
   })
@@ -29,17 +29,16 @@ export function addInventoryInfo(group, data) {
 // 修改inventory
 export function updateInventoryInfo(data) {
   return request({
-    url: '/api/v1/updateInventoryInfo',
+    url: '/api/v1/ansible/inventory/groups',
     method: 'put',
     data: data
   })
 }
 
 // 删除inventory
-export function deleteInventoryInfo(data) {
+export function deleteInventoryInfo(group) {
   return request({
-    url: '/api/v1/deleteInventoryInfo',
-    method: 'put',
-    data: data
+    url: '/api/v1/ansible/inventory/groups/' + group,
+    method: 'delete'
   })
 }

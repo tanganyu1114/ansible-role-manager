@@ -196,6 +196,7 @@ export default {
   },
   methods: {
     getList() {
+      this.inventoryList = []
       getAllIpaddr().then(response => {
         const Ips = response.data
         console.log(Ips)
@@ -213,30 +214,69 @@ export default {
       })
       this.loading = false
     },
+    resetForm() {
+      this.form = {
+        groupName: '',
+        ipAddrs: []
+      }
+    },
     handleAdd() {
+      this.resetForm()
       this.title = '新增inventory'
       this.open = true
     },
     handleUpdate(row) {
+      this.resetForm()
       this.title = '修改inventory'
-      this.form.groupName = row.groupName || this.ids
-      this.ipAddrs = row.ipAddrs
+      this.form.groupName = row.groupName || this.ids[0].groupName
+      this.form.ipAddrs = row.ipAddrs || this.ids[0].ipAddrs
+      this.form.targetGroupName = this.form.groupName
       this.open = true
     },
-    handleDelete() {
+    handleDelete(row) {
       // TODO:
+      const groupName = row.groupName || this.ids.map(item => item.groupName)
+      this.$confirm(
+        '是否确认删除组名为" ' + groupName + ' "的数据项?',
+        '警告',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(function() {
+          return deleteInventoryInfo(groupName)
+        })
+        .then(() => {
+          this.getList()
+          this.msgSuccess('删除成功')
+        }).catch(function() {})
     },
     // dialog弹窗函数
     submitForm() {
-      // TODO
       console.log('form:', this.form)
-      /*      const data = {}
-      data.groupName = this.form.groupName
-      data.ipAddrs = this.form.ipAddrs*/
-      // console.log(data)
-      addInventoryInfo(this.form.groupName, this.form).then(response => {
-        console.log('res:', response)
-      })
+      if (this.form.targetGroupName === undefined) {
+        addInventoryInfo(this.form).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('添加inventory成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      } else {
+        updateInventoryInfo(this.form).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('修改inventory成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      }
     },
     cancel() {
       this.open = false
@@ -272,7 +312,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.groupName)
+      console.log(selection)
+      // this.ids = selection.map(item => item.groupName)
+      this.ids = selection
       this.single = selection.length !== 1
       this.multiple = !selection.length
     }
