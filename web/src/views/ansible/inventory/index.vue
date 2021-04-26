@@ -98,7 +98,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="IP地址" prop="inputIp">
+              <el-form-item label="IP地址" prop="ipAddrs">
                 <el-tag
                   v-for="ip in form.ipAddrs"
                   :key="ip"
@@ -184,6 +184,9 @@ export default {
       rules: {
         groupName: [
           { required: true, message: '组名不能为空', trigger: 'blur' }
+        ],
+        ipAddrs: [
+          { required: true, message: 'IP地址不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -203,7 +206,7 @@ export default {
         const data = {}
         data.groupName = 'all'
         data.ipAddrs = Ips
-        this.inventoryList.push(data)
+        this.inventoryList.unshift(data)
       })
       getInventoryInfo().then(response => {
         const Gps = response.data
@@ -234,7 +237,6 @@ export default {
       this.open = true
     },
     handleDelete(row) {
-      // TODO:
       const groupName = row.groupName || this.ids.map(item => item.groupName)
       this.$confirm(
         '是否确认删除组名为" ' + groupName + ' "的数据项?',
@@ -284,7 +286,7 @@ export default {
     },
     // 动态tag函数信息
     handleClose(tag) {
-      this.ipAddrs.splice(this.ipAddrs.indexOf(tag), 1)
+      this.form.ipAddrs.splice(this.form.ipAddrs.indexOf(tag), 1)
     },
 
     showInput() {
