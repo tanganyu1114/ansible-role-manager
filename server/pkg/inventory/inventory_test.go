@@ -19,7 +19,8 @@ func testGroupExample() map[string]Group {
 
 func Test_inventory_AddHostToGroup(t *testing.T) {
 	type fields struct {
-		groups map[string]Group
+		groups           map[string]Group
+		isTruncatedGroup map[string]bool
 	}
 	type args struct {
 		groupName string
@@ -32,40 +33,55 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 		addFailed bool
 	}{
 		{
-			name:   "add host to exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add host to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group",
 				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 1, 2})},
 			},
 		},
 		{
-			name:   "add hosts to exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add hosts to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group1",
 				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 2, 2}), NewIPv4Host([4]byte{10, 2, 0, 2})},
 			},
 		},
 		{
-			name:   "add host to not exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add host to not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group3",
 				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 3, 1})},
 			},
 		},
 		{
-			name:   "add hosts to not exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add hosts to not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group4",
 				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 4, 1}), NewIPv4Host([4]byte{10, 4, 0, 1})},
 			},
 		},
 		{
-			name:   "add nil host to exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add nil host to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group",
 				hosts:     []Host{nil},
@@ -73,8 +89,11 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			addFailed: true,
 		},
 		{
-			name:   "add nil hosts to exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add nil hosts to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group",
 				hosts:     nil,
@@ -82,18 +101,23 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			addFailed: true,
 		},
 		{
-			name:   "add null host to exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add null host to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group",
 				hosts:     []Host{},
 			},
 			addFailed: true,
 		},
-
 		{
-			name:   "add nil host to not exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add nil host to not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group3",
 				hosts:     []Host{nil},
@@ -101,8 +125,11 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			addFailed: true,
 		},
 		{
-			name:   "add nil hosts to not exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add nil hosts to not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group3",
 				hosts:     nil,
@@ -110,8 +137,11 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			addFailed: true,
 		},
 		{
-			name:   "add null host to not exist group",
-			fields: fields{groups: testGroupExample()},
+			name: "add null host to not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				groupName: "test-group3",
 				hosts:     []Host{},
@@ -122,7 +152,8 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			i := &inventory{
-				groups: tt.fields.groups,
+				groups:           tt.fields.groups,
+				isTruncatedGroup: tt.fields.isTruncatedGroup,
 			}
 			var bLen, aLen int
 			if _, has := i.GetGroups()[tt.args.groupName]; has {
@@ -140,9 +171,9 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 }
 
 func Test_inventory_RenewGroupName(t *testing.T) {
-	groups := testGroupExample()
 	type fields struct {
-		groups map[string]Group
+		groups           map[string]Group
+		isTruncatedGroup map[string]bool
 	}
 	type args struct {
 		oldName string
@@ -155,16 +186,22 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "normal rename",
-			fields: fields{groups: groups},
+			name: "normal rename",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				oldName: "test-group",
 				newName: "test-group1",
 			},
 		},
 		{
-			name:   "not exist group",
-			fields: fields{groups: groups},
+			name: "not exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				oldName: "test-group1",
 				newName: "test-group3",
@@ -172,8 +209,11 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:   "rename to duplicate group",
-			fields: fields{groups: groups},
+			name: "rename to duplicate group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
 			args: args{
 				oldName: "test-group",
 				newName: "test-group2",
@@ -194,13 +234,14 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 			}
 
 			i := &inventory{
-				groups: g,
+				groups:           g,
+				isTruncatedGroup: make(map[string]bool),
 			}
 			if err := i.RenewGroupName(tt.args.oldName, tt.args.newName); (err != nil) != tt.wantErr {
 				t.Errorf("RenewGroupName() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				t.Logf("new group name = %v", i.GetGroups()[tt.args.newName].GetName())
+				t.Logf("old group name = %v, want new group name = %v, got %v", tt.args.oldName, tt.args.newName, i.GetGroups()[tt.args.newName].GetName())
 			}
 		})
 	}
