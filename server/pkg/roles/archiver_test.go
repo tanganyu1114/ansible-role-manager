@@ -6,11 +6,17 @@ import (
 	"testing"
 )
 
-func Test_tgzArchiver_Decompress(t *testing.T) {
+func Test_archiver_Decompress(t *testing.T) {
 	exDir := "../../test/pkg/roles/decompress"
-	tgzFileName := "test.tgz"
+	tgzFileName := "test-tgz-role.tgz"
 
 	tgzData, err := os.ReadFile(filepath.Join(exDir, tgzFileName))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	zipFileName := "test-zip-role.zip"
+	zipData, err := os.ReadFile(filepath.Join(exDir, zipFileName))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,10 +31,17 @@ func Test_tgzArchiver_Decompress(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "normal decompress",
+			name: "tgz decompress",
 			args: args{
 				exDir:          exDir,
 				compressedData: tgzData,
+			},
+		},
+		{
+			name: "zip decompress",
+			args: args{
+				exDir:          exDir,
+				compressedData: zipData,
 			},
 		},
 		{
@@ -42,7 +55,7 @@ func Test_tgzArchiver_Decompress(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := tgzArchiver{}
+			g := archiver{}
 			if err := g.Decompress(tt.args.exDir, tt.args.compressedData); (err != nil) != tt.wantErr {
 				t.Errorf("Decompress() error = %v, wantErr %v", err, tt.wantErr)
 			}

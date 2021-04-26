@@ -4,6 +4,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/alibaba/sentinel-golang v0.6.1
 	github.com/aliyun/aliyun-oss-go-sdk v0.0.0-20190307165228-86c17b95fcd5
+	github.com/c4milo/unpackit v0.1.0
 	github.com/casbin/casbin/v2 v2.25.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-admin-team/go-admin-core v1.3.4
