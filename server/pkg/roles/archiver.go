@@ -1,61 +1,32 @@
 package roles
 
 import (
-	"archive/tar"
 	"bytes"
-	"compress/gzip"
-	"github.com/alibaba/sentinel-golang/util"
-	"io"
-	"os"
-	"path/filepath"
+	"fmt"
+	"github.com/c4milo/unpackit"
+	"strings"
 )
 
 type Decompressor interface {
 	Decompress(exDir string, compressedData []byte) error
 }
 
-type tgzArchiver struct {
+type archiver struct {
 }
 
 func NewDecompressor() Decompressor {
-	decompressor := new(tgzArchiver)
+	decompressor := new(archiver)
 	return Decompressor(decompressor)
 }
 
-func (g tgzArchiver) Decompress(exDir string, compressedData []byte) error {
-	err := util.CreateDirIfNotExists(exDir)
-	if err != nil {
-		return err
-	}
+func (a archiver) Decompress(exDir string, compressedData []byte) error {
 	buf := bytes.NewReader(compressedData)
-	gzipReader, err := gzip.NewReader(buf)
+	afterExDir, err := unpackit.Unpack(buf, exDir)
 	if err != nil {
 		return err
 	}
-	defer gzipReader.Close()
-
-	tReader := tar.NewReader(gzipReader)
-	for {
-		tHeader, err := tReader.Next()
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
-		exF, err := os.Create(filepath.Join(exDir, tHeader.Name))
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(exF, tReader)
-		if err != nil {
-			exF.Close()
-			return err
-		}
-		exF.Close()
+	if !strings.EqualFold(strings.TrimSpace(afterExDir), strings.TrimSpace(exDir)) {
+		return fmt.Errorf("the exDir is inconsistent before and after decompression. before exDir = '%s', after exDir = '%s'", exDir, afterExDir)
 	}
 	return nil
 }
