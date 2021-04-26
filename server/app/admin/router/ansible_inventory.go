@@ -16,10 +16,9 @@ func registerAnsibleInventoryRouter(v1 *gin.RouterGroup, authMiddleware *jwt.Gin
 	api := inventory.NewInventoryApi()
 	r := v1.Group("/ansible/inventory").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		r.POST("/groups", api.AddHostToGroup)
-		r.PUT("/groups", api.RenewGroupName)
-		r.PATCH("/groups", api.RemoveHostFromGroup)
-		r.DELETE("/groups/:group", api.RemoveGroupByName)
+		r.POST("/groups", api.NewGroup)
+		r.PATCH("/groups", api.ModifyGroup)
+		r.DELETE("/groups/:group", api.DeleteGroup)
 		r.GET("/hosts", api.GetAllHosts)
 		r.GET("/groups", api.GetGroups)
 	}
