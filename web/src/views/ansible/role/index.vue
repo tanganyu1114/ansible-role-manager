@@ -5,7 +5,7 @@
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
             <el-button
-              v-permisaction="['ansible:inventory:add']"
+              v-permisaction="['ansible:role:add']"
               type="primary"
               icon="el-icon-upload2"
               size="small"
@@ -30,6 +30,7 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="描述" prop="roleComment" />
           <el-table-column
             label="标签"
             prop="tags"
@@ -49,7 +50,7 @@
           <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
-                v-permisaction="['ansible:inventory:edit']"
+                v-permisaction="['ansible:role:edit']"
                 size="mini"
                 type="text"
                 icon="el-icon-edit"
@@ -57,7 +58,7 @@
               >修改
               </el-button>
               <el-button
-                v-permisaction="['ansible:inventory:remove']"
+                v-permisaction="['ansible:role:remove']"
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
@@ -75,16 +76,35 @@
         />
       </el-card>
       <el-dialog :title="title" :visible.sync="open" width="800px">
-        <el-upload
-          class="upload-demo"
-          drag
-          action="https://jsonplaceholder.typicode.com/posts/"
-          multiple
-        >
-          <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div slot="tip" class="el-upload__tip">只能上传zip/tgz文件</div>
-        </el-upload>
+        <el-row>
+          <el-col :span="12">
+            <el-upload
+              ref="upload"
+              class="upload-role"
+              :auto-upload="false"
+              :on-change="handleOnChange"
+              :before-upload="handleBeforeUpload"
+              :data="uploadName"
+              drag
+              action="https://jsonplaceholder.typicode.com/posts/"
+            >
+              <i class="el-icon-upload" />
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              <div slot="tip" class="el-upload__tip">只能上传zip/tgz文件</div>
+            </el-upload>
+          </el-col>
+          <el-col :span="12">
+            <el-form ref="form" :model="form" :rules="rules">
+              <el-row :gutter="20">
+                <el-col :span="20">
+                  <el-form-item label="角色名称" prop="uploadName">
+                    <el-input v-model.trim="form.uploadName" placeholder="请输入组名" clearable />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
+          </el-col>
+        </el-row>
         <div slot="footer" class="dialog-footer">
           <el-row>
             <el-col>
@@ -119,15 +139,27 @@ export default {
       roleList: [],
       // tag筛选数据
       filterData: [],
+      // 上传role名字
+      uploadName: {},
+      form: {
+        uploadName: ''
+      },
       // 查询参数
       total: 0,
       queryParams: {
         pageIndex: 1,
         pageSize: 10
+      },
+      // 表单校验
+      rules: {
+        uploadName: [
+          { required: true, message: '角色名称不能为空', trigger: 'blur' }
+        ]
       }
     }
   },
   created() {
+    this.getList()
   },
   mounted() {
   },
@@ -141,6 +173,7 @@ export default {
       this.multiple = !selection.length
     },
     getList() {
+      this.loading = false
     },
     handleAdd() {
       this.title = '上传Role角色文件'
@@ -154,9 +187,20 @@ export default {
       return row.tag === value
     },
     uploadRole() {
+      this.uploadName = { name: this.form.uploadName }
+      // 手动上传
+      this.$refs.upload.submit()
     },
     cancel() {
       this.open = false
+    },
+    handleOnChange(file) {
+      this.form.uploadName = file.name.split('.')[0]
+    },
+    handleBeforeUpload(file) {
+      const fileArr = file.name.split('.')
+      const types = ['zip', 'tgz']
+      return types.includes(fileArr[fileArr.length - 1])
     }
   }
 }

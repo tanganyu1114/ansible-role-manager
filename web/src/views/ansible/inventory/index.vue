@@ -55,11 +55,13 @@
               <el-tag
                 v-for="ip in scope.row.ipAddrs"
                 :key="ip"
+                class="tag-ip"
               >
                 {{ ip }}
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="IP总数" prop="ipTotal" align="center" width="100" />
           <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
@@ -199,20 +201,29 @@ export default {
   },
   methods: {
     getList() {
+      // todo: 把all和inventory信息合并放到后端统一返回，添加分页查询功能
       this.inventoryList = []
       getAllIpaddr().then(response => {
-        const Ips = response.data
-        console.log(Ips)
-        const data = {}
-        data.groupName = 'all'
-        data.ipAddrs = Ips
-        this.inventoryList.unshift(data)
+        if (response.code === 200) {
+          const Ips = response.data
+          const data = {}
+          data.groupName = 'all'
+          data.ipAddrs = Ips
+          data.ipTotal = Ips.length
+          this.inventoryList.unshift(data)
+        } else {
+          this.msgError(response.msg)
+        }
       })
       getInventoryInfo().then(response => {
-        const Gps = response.data
-        console.log(Gps)
-        for (const data of Object.values(Gps)) {
-          this.inventoryList.push(data)
+        if (response.code === 200) {
+          const Gps = response.data
+          for (const data of Object.values(Gps)) {
+            data.ipTotal = data.ipAddrs.length
+            this.inventoryList.push(data)
+          }
+        } else {
+          this.msgError(response.msg)
         }
       })
       this.loading = false
@@ -281,8 +292,8 @@ export default {
       }
     },
     cancel() {
+      this.resetForm()
       this.open = false
-      // TODO
     },
     // 动态tag函数信息
     handleClose(tag) {
@@ -298,8 +309,10 @@ export default {
 
     handleInputConfirm() {
       const inIp = this.inputIp
+      const ipSet = new Set(this.form.ipAddrs)
       if (this.validateIpaddr(inIp)) {
-        this.form.ipAddrs.push(inIp)
+        ipSet.add(inIp)
+        this.form.ipAddrs = [...ipSet]
       } else {
         this.$message.error('IP地址格式错误')
       }
@@ -327,6 +340,10 @@ export default {
 <style scoped>
 .el-tag + .el-tag {
   margin-left: 10px;
+}
+.tag-ip {
+  margin-left: 10px;
+  margin-bottom: 10px;
 }
 .btn-input-ip {
   margin-left: 10px;
