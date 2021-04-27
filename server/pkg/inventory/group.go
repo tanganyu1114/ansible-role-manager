@@ -12,6 +12,10 @@ type Group interface {
 	removeHost(hosts ...Host)
 	setName(newName string) error
 	GetName() string
+
+	// GetHosts TODOList:
+	// TODO: 1.hosts 长度统计
+	// TODO: 2.hostsPatten 结构体实现，提供主机ip段存放，及提供长度统计
 	GetHosts() []Host
 	HostsLen() int
 }
@@ -50,9 +54,7 @@ func (g *group) addHost(hosts ...Host) error {
 		}
 		idx := sort.Search(g.HostsLen(), func(i int) bool {
 			if !g.hosts[i].GetIp().IP.Equal(h.GetIp().IP) {
-				iIPv4 := g.hosts[i].GetIp().IP.To4()
-				hIPv4 := h.GetIp().IP.To4()
-				return !isLessIPv4(iIPv4, hIPv4)
+				return !isLessIPAddr(g.hosts[i].GetIp(), h.GetIp())
 			}
 			return true
 		})
@@ -62,9 +64,7 @@ func (g *group) addHost(hosts ...Host) error {
 		isIn = false
 		g.hosts = append(g.hosts, h)
 		sort.Slice(g.hosts, func(x, y int) bool {
-			xIPv4 := g.hosts[x].GetIp().IP.To4()
-			yIPv4 := g.hosts[y].GetIp().IP.To4()
-			return isLessIPv4(xIPv4, yIPv4)
+			return isLessIPAddr(g.hosts[x].GetIp(), g.hosts[y].GetIp())
 		})
 	}
 	if isIn {
@@ -83,9 +83,7 @@ func (g *group) removeHost(hosts ...Host) {
 		}
 		idx := sort.Search(g.HostsLen(), func(i int) bool {
 			if !g.hosts[i].GetIp().IP.Equal(h.GetIp().IP) {
-				iIPv4 := g.hosts[i].GetIp().IP.To4()
-				hIPv4 := h.GetIp().IP.To4()
-				return !isLessIPv4(iIPv4, hIPv4)
+				return !isLessIPAddr(g.hosts[i].GetIp(), h.GetIp())
 			}
 			return true
 		})
@@ -116,12 +114,14 @@ func (g group) HostsLen() int {
 	return len(g.hosts)
 }
 
-func isLessIPv4(xIP, yIP net.IP) bool {
+func isLessIPAddr(x, y net.IPAddr) bool {
+	xIPv4 := x.IP.To4()
+	yIPv4 := y.IP.To4()
 	for j := 0; j < net.IPv4len; j++ {
-		if xIP[j] == yIP[j] {
+		if xIPv4[j] == yIPv4[j] {
 			continue
 		}
-		if xIP[j] < yIP[j] {
+		if xIPv4[j] < yIPv4[j] {
 			return true
 		}
 		return false

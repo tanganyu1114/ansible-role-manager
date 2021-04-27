@@ -3,20 +3,36 @@ package roles
 import (
 	"bytes"
 	"fmt"
+	"github.com/c4milo/packit"
 	"github.com/c4milo/unpackit"
 	"strings"
 )
 
-type Decompressor interface {
+type Archiver interface {
 	Decompress(exDir string, compressedData []byte) error
+	Compress(exDir string) ([]byte, error)
 }
 
 type archiver struct {
 }
 
-func NewDecompressor() Decompressor {
+func newArchiver() Archiver {
 	decompressor := new(archiver)
-	return Decompressor(decompressor)
+	return Archiver(decompressor)
+}
+
+func (a archiver) Compress(exDir string) ([]byte, error) {
+	//err := os.Chdir(exDir)
+	//if err != nil {
+	//	return nil, err
+	//}
+	buf := bytes.NewBuffer(nil)
+	packit.Zip(exDir, buf)
+	data := buf.Bytes()
+	if data == nil || len(data) == 0 {
+		return nil, fmt.Errorf("failed to compress the '%s' directroy file", exDir)
+	}
+	return data, nil
 }
 
 func (a archiver) Decompress(exDir string, compressedData []byte) error {
