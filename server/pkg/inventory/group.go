@@ -12,6 +12,10 @@ type Group interface {
 	removeHost(hosts ...Host)
 	setName(newName string) error
 	GetName() string
+
+	// GetHosts TODOList:
+	// TODO: 1.hosts 长度统计
+	// TODO: 2.hostsPatten 结构体实现，提供主机ip段存放，及提供长度统计
 	GetHosts() []Host
 	HostsLen() int
 }

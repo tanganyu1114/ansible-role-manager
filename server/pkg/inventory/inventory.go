@@ -10,7 +10,7 @@ type Inventory interface {
 	RemoveHostFromGroup(groupName string, hosts ...Host)
 	RemoveGroup(groupName string)
 	GetAllHosts() []Host
-	GetGroups() map[string]Group
+	GetGroups() map[string]Group // TODO: 分页查询机制
 	getTruncatedGroup() map[string]bool
 }
 
