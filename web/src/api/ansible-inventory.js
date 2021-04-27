@@ -30,7 +30,7 @@ export function addInventoryInfo(data) {
 export function updateInventoryInfo(data) {
   return request({
     url: '/api/v1/ansible/inventory/groups',
-    method: 'put',
+    method: 'patch',
     data: data
   })
 }
