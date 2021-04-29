@@ -9,8 +9,10 @@ func testGroupExample() map[string]Group {
 	group2 := newGroup()
 	_ = group1.setName("test-group")
 	_ = group2.setName("test-group2")
-	_ = group1.addHost(NewIPv4Host([4]byte{192, 168, 0, 1}), NewIPv4Host([4]byte{10, 1, 0, 1}))
-	_ = group2.addHost(NewIPv4Host([4]byte{192, 168, 1, 1}), NewIPv4Host([4]byte{10, 2, 0, 1}))
+	_ = group1.addHost(ParseHost("192.168.0.1"), ParseHost("10.1.0.1"))
+	_ = group2.addHost(ParseHost("192.168.1.1"), ParseHost("10.2.0.1"))
+	_ = group1.addHost(ParseHost("192.168.[11:100].[1:254]"))
+	_ = group2.addHost(ParseHost("192.168.[21:200].[1:254]"))
 	groups := make(map[string]Group)
 	groups[group1.GetName()] = group1
 	groups[group2.GetName()] = group2
@@ -40,7 +42,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			},
 			args: args{
 				groupName: "test-group",
-				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 1, 2})},
+				hosts:     []Host{ParseHost("192.168.1.2")},
 			},
 		},
 		{
@@ -50,8 +52,19 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				isTruncatedGroup: make(map[string]bool),
 			},
 			args: args{
-				groupName: "test-group1",
-				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 2, 2}), NewIPv4Host([4]byte{10, 2, 0, 2})},
+				groupName: "test-group2",
+				hosts:     []Host{ParseHost("192.168.2.2"), ParseHost("10.2.0.2")},
+			},
+		},
+		{
+			name: "add hosts pattern to exist group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
+			args: args{
+				groupName: "test-group2",
+				hosts:     []Host{ParseHost("192.168.[19:30].[1:100]"), ParseHost("10.2.3.[1:254]")},
 			},
 		},
 		{
@@ -62,7 +75,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			},
 			args: args{
 				groupName: "test-group3",
-				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 3, 1})},
+				hosts:     []Host{ParseHost("192.168.3.1")},
 			},
 		},
 		{
@@ -73,7 +86,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 			},
 			args: args{
 				groupName: "test-group4",
-				hosts:     []Host{NewIPv4Host([4]byte{192, 168, 4, 1}), NewIPv4Host([4]byte{10, 4, 0, 1})},
+				hosts:     []Host{ParseHost("192.168.4.1"), ParseHost("10.4.0.1")},
 			},
 		},
 		{

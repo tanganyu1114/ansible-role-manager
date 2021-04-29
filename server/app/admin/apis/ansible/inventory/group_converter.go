@@ -39,7 +39,7 @@ func (g groupConverter) ConvertToVO(bo svc.Group) Group {
 		Hosts:     make([]Host, 0),
 	}
 	for _, hostBO := range bo.GetHosts() {
-		hostVO := Host(hostBO.GetIp().IP.String())
+		hostVO := Host(hostBO.GetIPString())
 		groupVO.Hosts = append(groupVO.Hosts, hostVO)
 	}
 	return groupVO

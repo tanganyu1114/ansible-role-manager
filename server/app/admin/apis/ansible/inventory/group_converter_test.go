@@ -7,7 +7,7 @@ import (
 )
 
 func Test_groupConverter_ConvertToBO(t *testing.T) {
-	wantGroupBO, err := svc.NewGroup("test-group", []svc.Host{svc.NewIPv4Host([4]byte{192, 168, 0, 1})})
+	wantGroupBO, err := svc.NewGroup("test-group", []svc.Host{svc.ParseHost("192.168.0.1"), svc.ParseHost("10.1.[0:128].[129:254]")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func Test_groupConverter_ConvertToBO(t *testing.T) {
 			name: "normal test",
 			args: args{vo: Group{
 				GroupName: "test-group",
-				Hosts:     []Host{Host("192.168.0.1")},
+				Hosts:     []Host{Host("192.168.0.1"), Host("10.1.[0:128].[129:254]")},
 			}},
 			want: wantGroupBO,
 		},
@@ -32,6 +32,14 @@ func Test_groupConverter_ConvertToBO(t *testing.T) {
 			name: "no group name",
 			args: args{vo: Group{
 				Hosts: []Host{Host("192.168.0.1")},
+			}},
+			wantErr: true,
+		},
+		{
+			name: "error host string",
+			args: args{vo: Group{
+				GroupName: "test-group",
+				Hosts:     []Host{Host("192.168.0.1"), Host("10.1.[0..128].{129-254}")},
 			}},
 			wantErr: true,
 		},
@@ -44,6 +52,9 @@ func Test_groupConverter_ConvertToBO(t *testing.T) {
 				t.Errorf("ConvertToBO() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			if err != nil {
+				t.Logf("ConvertToBO() error: %s", err)
+			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ConvertToBO() got = %v, want %v", got, tt.want)
 			}
@@ -52,7 +63,7 @@ func Test_groupConverter_ConvertToBO(t *testing.T) {
 }
 
 func Test_groupConverter_ConvertToVO(t *testing.T) {
-	groupBO, err := svc.NewGroup("test-group", []svc.Host{svc.NewIPv4Host([4]byte{192, 168, 0, 1})})
+	groupBO, err := svc.NewGroup("test-group", []svc.Host{svc.ParseHost("192.168.0.1")})
 	if err != nil {
 		t.Fatal(err)
 	}

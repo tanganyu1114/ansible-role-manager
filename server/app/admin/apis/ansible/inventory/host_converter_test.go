@@ -19,7 +19,7 @@ func Test_hostsConverter_ConvertToBO(t *testing.T) {
 		{
 			name:   "normal test",
 			args:   args{vo: []Host{"192.168.0.1", "10.1.0.1"}},
-			wantBo: []svc.Host{svc.NewIPv4Host([4]byte{192, 168, 0, 1}), svc.NewIPv4Host([4]byte{10, 1, 0, 1})},
+			wantBo: []svc.Host{svc.ParseHost("192.168.0.1"), svc.ParseHost("10.1.0.1")},
 		},
 		{
 			name:   "nil hosts",
@@ -68,8 +68,8 @@ func Test_hostsConverter_ConvertToVO(t *testing.T) {
 	}{
 		{
 			name: "normal test",
-			args: args{bo: []svc.Host{svc.NewIPv4Host([4]byte{192, 168, 0, 1}), svc.NewIPv4Host([4]byte{10, 1, 0, 1})}},
-			want: []Host{"192.168.0.1", "10.1.0.1"},
+			args: args{bo: []svc.Host{svc.ParseHost("192.168.0.1"), svc.ParseHost("10.1.0.1"), svc.ParseHost("10.1.[0:255].[1:127]")}},
+			want: []Host{"192.168.0.1", "10.1.0.1", "10.1.[0:255].[1:127]"},
 		},
 		{
 			name: "nil hosts",
