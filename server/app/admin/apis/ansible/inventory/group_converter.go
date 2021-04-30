@@ -34,9 +34,11 @@ func (g groupConverter) ConvertToBO(vo Group) (svc.Group, error) {
 
 func (g groupConverter) ConvertToVO(bo svc.Group) Group {
 	groupName := bo.GetName()
+	hostsLen := bo.HostsLen()
 	groupVO := Group{
 		GroupName: groupName,
 		Hosts:     make([]Host, 0),
+		HostsLen:  hostsLen,
 	}
 	for _, hostBO := range bo.GetHosts() {
 		hostVO := Host(hostBO.GetIPString())

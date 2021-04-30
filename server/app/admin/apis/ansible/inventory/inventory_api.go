@@ -13,7 +13,6 @@ type InventoryApi interface {
 	NewGroup(c *gin.Context)
 	ModifyGroup(c *gin.Context)
 	DeleteGroup(c *gin.Context)
-	GetAllHosts(c *gin.Context)
 	GetGroups(c *gin.Context)
 }
 
@@ -95,12 +94,6 @@ func (i *inventoryApi) DeleteGroup(c *gin.Context) {
 	}
 
 	i.OK(c, nil, "完成删除操作")
-}
-
-func (i *inventoryApi) GetAllHosts(c *gin.Context) {
-	// method: GET location: /hosts
-	hostsVO := i.vo.GetAllHosts()
-	i.OK(c, hostsVO, "成功查询所有主机信息")
 }
 
 func (i *inventoryApi) GetGroups(c *gin.Context) {

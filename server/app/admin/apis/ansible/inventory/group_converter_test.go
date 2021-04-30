@@ -63,13 +63,14 @@ func Test_groupConverter_ConvertToBO(t *testing.T) {
 }
 
 func Test_groupConverter_ConvertToVO(t *testing.T) {
-	groupBO, err := svc.NewGroup("test-group", []svc.Host{svc.ParseHost("192.168.0.1")})
+	groupBO, err := svc.NewGroup("test-group", []svc.Host{svc.ParseHost("192.168.0.1"), svc.ParseHost("10.1.[0:100].[1:254]")})
 	if err != nil {
 		t.Fatal(err)
 	}
 	wantGroupVO := Group{
 		GroupName: "test-group",
-		Hosts:     []Host{Host("192.168.0.1")},
+		Hosts:     []Host{"10.1.[0:100].[1:254]", "192.168.0.1"},
+		HostsLen:  1 + 254*101,
 	}
 	type args struct {
 		bo svc.Group

@@ -9,7 +9,7 @@ type Inventory interface {
 	RenewGroupName(oldName, newName string) error
 	RemoveHostFromGroup(groupName string, hosts ...Host)
 	RemoveGroup(groupName string)
-	GetAllHosts() []Host
+	GetAllHosts() ([]Host, int)  // DONE: 新增反馈主机总数
 	GetGroups() map[string]Group // TODO: 分页查询机制
 	getTruncatedGroup() map[string]bool
 }
@@ -78,17 +78,19 @@ func (i *inventory) RemoveGroup(groupName string) {
 	}
 }
 
-func (i inventory) GetAllHosts() []Host {
+func (i inventory) GetAllHosts() ([]Host, int) {
 	groupAll := newGroup()
+	count := 0
 	for _, g := range i.groups {
 		_ = groupAll.addHost(g.GetHosts()...)
+		count += g.HostsLen()
 		// todo: handle error
 		//err := groupAll.addHost(g.GetHosts()...)
 		//if err != nil {
 		//	fmt.Printf("get hosts from group %s failed, cased by: %s\n", g.GetName(), err)
 		//}
 	}
-	return groupAll.GetHosts()
+	return groupAll.GetHosts(), count
 }
 
 func (i inventory) GetGroups() map[string]Group {
