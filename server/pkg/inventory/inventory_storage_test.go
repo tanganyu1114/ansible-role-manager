@@ -77,8 +77,8 @@ func Test_inventoryFileStorage_Load(t *testing.T) {
 				return
 			}
 
-			gotGroups := got.GetGroups()
-			wantGroups := tt.want.GetGroups()
+			gotGroups := got.getAllGroups()
+			wantGroups := tt.want.getAllGroups()
 			if len(gotGroups) != len(wantGroups) {
 				t.Errorf("Load() gotGroups = %v, wantGroups %v", gotGroups, wantGroups)
 				return

@@ -24,10 +24,10 @@ func Test_inventoryFileParser_Parse(t *testing.T) {
 			want: Group(&group{
 				groupName: "test-group",
 				hosts: []Host{
-					Host(&host{ipAddr: net.IPAddr{
+					Host(host{ipAddr: net.IPAddr{
 						IP: net.IP{10, 1, 0, 1},
 					}}),
-					Host(&host{ipAddr: net.IPAddr{
+					Host(host{ipAddr: net.IPAddr{
 						IP: net.IP{192, 168, 0, 1},
 					}}),
 				},
@@ -60,8 +60,8 @@ func Test_inventoryFileParser_Dump(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_ = testGroup.addHost(NewIPv4Host([4]byte{192, 168, 0, 1}))
-	_ = testGroup.addHost(NewIPv4Host([4]byte{10, 1, 0, 1}))
+	_ = testGroup.addHost(ParseHost("192.168.0.1"))
+	_ = testGroup.addHost(ParseHost("10.1.0.1"))
 	data := []byte("[test-group]\n10.1.0.1\n192.168.0.1\n")
 	type args struct {
 		g Group

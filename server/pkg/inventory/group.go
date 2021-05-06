@@ -2,7 +2,6 @@ package inventory
 
 import (
 	"errors"
-	"net"
 	"sort"
 	"strings"
 )
@@ -14,9 +13,10 @@ type Group interface {
 	GetName() string
 
 	// GetHosts TODOList:
-	// TODO: 1.hosts 长度统计
-	// TODO: 2.hostsPatten 结构体实现，提供主机ip段存放，及提供长度统计
+	// DONE: 2.hostsPattern 结构体实现，提供主机ip段存放，及提供数量统计
 	GetHosts() []Host
+	// HostsLen TODOList:
+	// DONE: 1.hosts 数量统计
 	HostsLen() int
 }
 
@@ -52,19 +52,24 @@ func (g *group) addHost(hosts ...Host) error {
 		if h == nil {
 			continue
 		}
-		idx := sort.Search(g.HostsLen(), func(i int) bool {
-			if !g.hosts[i].GetIp().IP.Equal(h.GetIp().IP) {
-				return !isLessIPAddr(g.hosts[i].GetIp(), h.GetIp())
-			}
-			return true
+		idx := sort.Search(len(g.hosts), func(i int) bool {
+			return !g.hosts[i].Less(h) || g.hosts[i].IsInclude(h) || h.IsInclude(g.hosts[i])
 		})
-		if idx < g.HostsLen() && g.hosts[idx].GetIp().IP.Equal(h.GetIp().IP) {
-			continue
+		if idx < len(g.hosts) {
+			// 判断索引对象与插入对象是否相同或者涵盖插入对象
+			if g.hosts[idx].Equal(h) || g.hosts[idx].IsInclude(h) {
+				continue
+			}
+			// 判断插入对象是否涵盖索引对象
+			if h.IsInclude(g.hosts[idx]) {
+				// 如果涵盖则删除索引对象
+				g.hosts = append(g.hosts[:idx], g.hosts[idx+1:]...)
+			}
 		}
 		isIn = false
 		g.hosts = append(g.hosts, h)
 		sort.Slice(g.hosts, func(x, y int) bool {
-			return isLessIPAddr(g.hosts[x].GetIp(), g.hosts[y].GetIp())
+			return g.hosts[x].Less(g.hosts[y])
 		})
 	}
 	if isIn {
@@ -81,13 +86,10 @@ func (g *group) removeHost(hosts ...Host) {
 		if h == nil {
 			continue
 		}
-		idx := sort.Search(g.HostsLen(), func(i int) bool {
-			if !g.hosts[i].GetIp().IP.Equal(h.GetIp().IP) {
-				return !isLessIPAddr(g.hosts[i].GetIp(), h.GetIp())
-			}
-			return true
+		idx := sort.Search(len(g.hosts), func(i int) bool {
+			return g.hosts[i].Less(h)
 		})
-		if idx < g.HostsLen() && g.hosts[idx].GetIp().IP.Equal(h.GetIp().IP) {
+		if idx < len(g.hosts) && g.hosts[idx].Equal(h) {
 			g.hosts = append(g.hosts[:idx], g.hosts[idx+1:]...)
 		}
 	}
@@ -111,20 +113,9 @@ func (g group) GetHosts() []Host {
 }
 
 func (g group) HostsLen() int {
-	return len(g.hosts)
-}
-
-func isLessIPAddr(x, y net.IPAddr) bool {
-	xIPv4 := x.IP.To4()
-	yIPv4 := y.IP.To4()
-	for j := 0; j < net.IPv4len; j++ {
-		if xIPv4[j] == yIPv4[j] {
-			continue
-		}
-		if xIPv4[j] < yIPv4[j] {
-			return true
-		}
-		return false
+	num := 0
+	for _, h := range g.hosts {
+		num += h.Len()
 	}
-	return false
+	return num
 }
