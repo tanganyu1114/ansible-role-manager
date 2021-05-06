@@ -33,6 +33,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 		fields    fields
 		args      args
 		addFailed bool
+		wantErr   bool
 	}{
 		{
 			name: "add host to exist group",
@@ -100,6 +101,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     []Host{nil},
 			},
 			addFailed: true,
+			wantErr:   true,
 		},
 		{
 			name: "add nil hosts to exist group",
@@ -112,6 +114,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     nil,
 			},
 			addFailed: true,
+			wantErr:   true,
 		},
 		{
 			name: "add null host to exist group",
@@ -124,6 +127,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     []Host{},
 			},
 			addFailed: true,
+			wantErr:   true,
 		},
 		{
 			name: "add nil host to not exist group",
@@ -136,6 +140,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     []Host{nil},
 			},
 			addFailed: true,
+			wantErr:   true,
 		},
 		{
 			name: "add nil hosts to not exist group",
@@ -148,6 +153,7 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     nil,
 			},
 			addFailed: true,
+			wantErr:   true,
 		},
 		{
 			name: "add null host to not exist group",
@@ -160,6 +166,33 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				hosts:     []Host{},
 			},
 			addFailed: true,
+			wantErr:   true,
+		},
+		{
+			name: "add host to the group which named 'all'",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
+			args: args{
+				groupName: "all",
+				hosts:     []Host{ParseHost("192.168.4.1")},
+			},
+			addFailed: true,
+			wantErr:   true,
+		},
+		{
+			name: "add hosts to the group which named 'All'",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
+			args: args{
+				groupName: "All",
+				hosts:     []Host{ParseHost("192.168.[0-200].[1-254]"), ParseHost("10.1.4.100")},
+			},
+			addFailed: true,
+			wantErr:   true,
 		},
 	}
 	for _, tt := range tests {
@@ -169,12 +202,14 @@ func Test_inventory_AddHostToGroup(t *testing.T) {
 				isTruncatedGroup: tt.fields.isTruncatedGroup,
 			}
 			var bLen, aLen int
-			if _, has := i.GetGroups()[tt.args.groupName]; has {
-				bLen = i.GetGroups()[tt.args.groupName].HostsLen()
+			if _, has := i.groups[tt.args.groupName]; has {
+				bLen = i.groups[tt.args.groupName].HostsLen()
 			}
-			i.AddHostToGroup(tt.args.groupName, tt.args.hosts...)
-			if _, has := i.GetGroups()[tt.args.groupName]; has {
-				aLen = i.GetGroups()[tt.args.groupName].HostsLen()
+			if err := i.AddHostToGroup(tt.args.groupName, tt.args.hosts...); (err != nil) != tt.wantErr {
+				t.Errorf("AddHostGroup() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if _, has := i.groups[tt.args.groupName]; has {
+				aLen = i.groups[tt.args.groupName].HostsLen()
 			}
 			if (bLen >= aLen) != tt.addFailed {
 				t.Errorf("AddHostToGroup() add failed, before lenghth = %d, after lenghth = %d", bLen, aLen)
@@ -233,6 +268,30 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "rename to 'all' group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
+			args: args{
+				oldName: "test-group",
+				newName: "all",
+			},
+			wantErr: true,
+		},
+		{
+			name: "rename to 'All' group",
+			fields: fields{
+				groups:           testGroupExample(),
+				isTruncatedGroup: make(map[string]bool),
+			},
+			args: args{
+				oldName: "test-group2",
+				newName: "All",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -246,15 +305,76 @@ func Test_inventory_RenewGroupName(t *testing.T) {
 				_ = g[s].addHost(g2.GetHosts()...)
 			}
 
-			i := &inventory{
-				groups:           g,
-				isTruncatedGroup: make(map[string]bool),
-			}
+			//i := &inventory{
+			//	groups:           g,
+			//	isTruncatedGroup: make(map[string]bool),
+			//}
+			i := newInventory(g)
 			if err := i.RenewGroupName(tt.args.oldName, tt.args.newName); (err != nil) != tt.wantErr {
 				t.Errorf("RenewGroupName() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				t.Logf("old group name = %v, want new group name = %v, got %v", tt.args.oldName, tt.args.newName, i.GetGroups()[tt.args.newName].GetName())
+				t.Logf("old group name = %v, want new group name = %v, got %v", tt.args.oldName, tt.args.newName, i.getAllGroups()[tt.args.newName].GetName())
+			}
+		})
+	}
+}
+
+func Test_isLessString(t *testing.T) {
+	type args struct {
+		x string
+		y string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "abc < acb == true",
+			args: args{
+				x: "abc",
+				y: "acb",
+			},
+			want: true,
+		},
+		{
+			name: "abc < abc == false",
+			args: args{
+				x: "abc",
+				y: "abc",
+			},
+			want: false,
+		},
+		{
+			name: "abc < abca == true",
+			args: args{
+				x: "abc",
+				y: "abca",
+			},
+			want: true,
+		},
+		{
+			name: "abca < abc == false",
+			args: args{
+				x: "abca",
+				y: "abc",
+			},
+			want: false,
+		},
+		{
+			name: "abc < acba == true",
+			args: args{
+				x: "abc",
+				y: "acba",
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isLessString(tt.args.x, tt.args.y); got != tt.want {
+				t.Errorf("isLessString() = %v, want %v", got, tt.want)
 			}
 		})
 	}

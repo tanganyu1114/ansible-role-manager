@@ -9,7 +9,7 @@ type Group struct {
 type Host string
 
 type Groups struct {
-	GroupsMap map[string]Group `json:"groupsMap"`
-	Hosts     []Host           `json:"ipAddrs"`
-	HostsLen  int              `json:"hostsLen"`
+	TotalGroupsNum int              `json:"totalGroupsNum"`
+	TotalPagesNum  int              `json:"totalPagesNum"`
+	GroupsMap      map[string]Group `json:"groupsMap"`
 }

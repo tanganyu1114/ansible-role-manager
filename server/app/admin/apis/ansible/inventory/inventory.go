@@ -11,9 +11,7 @@ type Inventory interface {
 	RenewGroupName(oldName, newName string) error
 	RemoveHostFromGroup(groupName string, hosts ...Host) error
 	RemoveGroup(groupName string) error
-	GetGroups() Groups
-	//GetAllHosts() []Host
-	//GetGroups() map[string]Group
+	GetGroups(limit, page int) Groups
 }
 
 type inventory struct {
@@ -41,8 +39,7 @@ func (i *inventory) AddHostToGroup(groupName string, hosts ...Host) error {
 	}
 
 	err = i.boDO(true, func(invBO svc.Inventory) error {
-		invBO.AddHostToGroup(groupBO.GetName(), groupBO.GetHosts()...)
-		return nil
+		return invBO.AddHostToGroup(groupBO.GetName(), groupBO.GetHosts()...)
 	})
 
 	return err
@@ -86,14 +83,13 @@ func (i *inventory) RemoveGroup(groupName string) error {
 	return err
 }
 
-func (i *inventory) GetGroups() Groups {
+func (i *inventory) GetGroups(limit, page int) Groups {
 	groupsVO := &Groups{}
-	hostsC := newHostsVOConverter()
 	groupC := newGroupVOConverter()
 	_ = i.boDO(false, func(invBO svc.Inventory) error {
-		hostsBO, l := invBO.GetAllHosts()
-		groupsVO.Hosts, groupsVO.HostsLen = hostsC.ConvertToVO(hostsBO), l
-		groupsBO := invBO.GetGroups()
+		gn, pn, groupsBO := invBO.GetGroups(limit, page)
+		groupsVO.TotalGroupsNum = gn
+		groupsVO.TotalPagesNum = pn
 		for s, groupBO := range groupsBO {
 			groupsVO.GroupsMap[s] = groupC.ConvertToVO(groupBO)
 		}

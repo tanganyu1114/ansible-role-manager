@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tanganyu1114/ansible-role-manager/common/apis"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -98,6 +99,23 @@ func (i *inventoryApi) DeleteGroup(c *gin.Context) {
 
 func (i *inventoryApi) GetGroups(c *gin.Context) {
 	// method: GET location: /groups
-	groupsVO := i.vo.GetGroups()
+	limitStr, ok := c.GetQuery("limit")
+	if !ok {
+		limitStr = "10"
+	}
+	pageStr, ok := c.GetQuery("page")
+	if !ok {
+		pageStr = "1"
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		i.Error(c, http.StatusBadRequest, fmt.Errorf("param 'limit' is invalid: %s", err), "传参limit的值不正确")
+	}
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		i.Error(c, http.StatusBadRequest, fmt.Errorf("param 'page' is invalid: %s", err), "传参page的值不正确")
+	}
+
+	groupsVO := i.vo.GetGroups(limit, page)
 	i.OK(c, groupsVO, "成功查询所有组信息")
 }

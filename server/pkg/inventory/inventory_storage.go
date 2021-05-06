@@ -92,7 +92,7 @@ func (i inventoryFileStorage) Save(inv Inventory) error {
 	}
 
 	// 保存配置
-	for gName, g := range inv.GetGroups() {
+	for gName, g := range inv.getAllGroups() {
 		b, err := i.parser.Dump(g)
 		if err != nil {
 			return err
