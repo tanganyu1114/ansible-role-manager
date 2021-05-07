@@ -39,22 +39,26 @@ func (r *rolesApi) AddRoleByCompressedData(c *gin.Context) {
 		r.Error(c, http.StatusNotFound, errors.New("role name is null"), "指定的role为空")
 		return
 	}
-	roleDataFileHeader, err := c.FormFile("compressedData")
+	roleDataFileHeader, err := c.FormFile("file")
 	if err != nil {
 		r.Error(c, http.StatusBadRequest, err, "错误的role文件")
+		return
 	}
 	roleDataFile, err := roleDataFileHeader.Open()
 	if err != nil {
 		r.Error(c, http.StatusBadRequest, err, "role文件无法打开")
+		return
 	}
 	defer roleDataFile.Close()
 	roleData, err := ioutil.ReadAll(roleDataFile)
 	if err != nil {
 		r.Error(c, http.StatusBadRequest, err, "读取role文件失败")
+		return
 	}
 	err = r.vo.ImportRoleData(roleName, roleData)
 	if err != nil {
 		r.Error(c, http.StatusBadRequest, err, "导入role文件失败")
+		return
 	}
 	r.OK(c, nil, "导入role文件成功")
 }

@@ -167,7 +167,7 @@ func (i inventory) generateGroupAll() Group {
 }
 
 func (i *inventory) sortGroups() {
-	sort.SliceIsSorted(i.sortedGroupNames, func(x, y int) bool {
+	sort.Slice(i.sortedGroupNames, func(x, y int) bool {
 		return isLessString(i.sortedGroupNames[x], i.sortedGroupNames[y])
 	})
 }

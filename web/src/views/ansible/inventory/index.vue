@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { getInventoryInfo, getAllIpaddr, addInventoryInfo, updateInventoryInfo, deleteInventoryInfo } from '@/api/ansible-inventory'
+import { getInventoryInfo, addInventoryInfo, updateInventoryInfo, deleteInventoryInfo } from '@/api/ansible-inventory'
 
 export default {
   name: 'Inventory',
@@ -203,7 +203,6 @@ export default {
   },
   methods: {
     getList() {
-      // todo: 把all和inventory信息合并放到后端统一返回，添加分页查询功能
       this.inventoryList = []
       getInventoryInfo(this.queryParams).then(response => {
         if (response.code === 200) {
@@ -231,19 +230,23 @@ export default {
       this.open = true
     },
     handleUpdate(row) {
-      if (row.groupName === 'all' || this.ids[0].groupName === 'all') {
-        this.single = this.multiple = false
-        return
-      }
       this.resetForm()
       this.title = '修改inventory'
       this.form.groupName = row.groupName || this.ids[0].groupName
       this.form.ipAddrs = row.ipAddrs || this.ids[0].ipAddrs
       this.form.targetGroupName = this.form.groupName
+      if (this.form.groupName === 'all') {
+        this.single = this.multiple = false
+        return
+      }
       this.open = true
     },
     handleDelete(row) {
       const groupName = row.groupName || this.ids.map(item => item.groupName)
+      if (groupName === 'all') {
+        this.single = this.multiple = false
+        return
+      }
       this.$confirm(
         '是否确认删除组名为" ' + groupName + ' "的数据项?',
         '警告',

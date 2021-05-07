@@ -12,6 +12,16 @@
               @click="handleAdd"
             >上传</el-button>
           </el-col>
+          <el-col :span="1.5">
+            <el-button
+              v-permisaction="['ansible:inventory:remove']"
+              type="danger"
+              icon="el-icon-delete"
+              size="small"
+              :disabled="multiple"
+              @click="handleDelete"
+            >删除</el-button>
+          </el-col>
         </el-row>
         <!-- 表格信息 -->
         <el-table
@@ -72,8 +82,8 @@
         </el-table>
         <pagination
           :total="total"
-          :page.sync="queryParams.pageIndex"
-          :limit.sync="queryParams.pageSize"
+          :page.sync="queryParams.page"
+          :limit.sync="queryParams.limit"
           @pagination="getList"
         />
       </el-card>
@@ -84,11 +94,15 @@
               ref="upload"
               class="upload-role"
               accept=".zip, .tgz"
+              :limit="1"
               :auto-upload="false"
+              :headers="upload.headers"
               :on-change="handleOnChange"
               :before-upload="handleBeforeUpload"
-              :data="uploadName"
-              :action="uploadUrl + form.uploadName"
+              :on-success="handleOnSuccess"
+              :on-error="handleOnError"
+              :data="upload.roleName"
+              :action="upload.uploadUrl + form.uploadName"
               drag
             >
               <i class="el-icon-upload" />
@@ -101,7 +115,7 @@
               <el-row :gutter="20">
                 <el-col :span="20">
                   <el-form-item label="角色名称" prop="uploadName">
-                    <el-input v-model.trim="form.uploadName" placeholder="请输入组名" clearable />
+                    <el-input v-model.trim="form.uploadName" placeholder="请输入角色名称" clearable />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -122,6 +136,8 @@
 </template>
 
 <script>
+import { getToken } from '@/utils/auth'
+
 export default {
   name: 'Role',
   data() {
@@ -142,23 +158,30 @@ export default {
       roleList: [],
       // tag筛选数据
       filterData: [],
-      // 上传role名字
-      uploadName: {},
+      // upload
+      upload: {
+        // 上传role名字
+        roleName: {},
+        // 上传文件时头信息
+        headers: { Authorization: 'Bearer ' + getToken() },
+        // 上传地址
+        uploadUrl: process.env.VUE_APP_BASE_API + '/api/v1/ansible/roles/'
+      },
       form: {
         uploadName: ''
       },
-      uploadUrl: process.env.VUE_APP_BASE_API + '/api/v1/ansible/roles/',
       // 查询参数
       total: 0,
       queryParams: {
-        pageIndex: 1,
-        pageSize: 10,
+        page: 1,
+        limit: 10,
         tags: []
       },
       // 表单校验
       rules: {
         uploadName: [
-          { required: true, message: '角色名称不能为空', trigger: 'blur' }
+          { required: true, message: '角色名称不能为空', trigger: 'blur' },
+          { pattern: /^(\w){4,20}$/, message: '只能输入4-20个字母、数字、下划线' }
         ]
       }
     }
@@ -198,7 +221,7 @@ export default {
       return row.tag === value
     },
     uploadRole() {
-      this.uploadName = { name: this.form.uploadName }
+      this.upload.roleName = { 'role': this.form.uploadName }
       // 手动上传
       this.$refs.upload.submit()
     },
@@ -206,7 +229,7 @@ export default {
       this.open = false
     },
     handleOnChange(file) {
-      this.form.uploadName = file.name.split('.')[0]
+      this.form.uploadName = this.form.uploadName || file.name.split('.')[0]
     },
     handleBeforeUpload(file) {
       const fileArr = file.name.split('.')
@@ -216,6 +239,16 @@ export default {
       } else {
         this.msgError('文件格式错误!')
       }
+    },
+    handleOnSuccess(response, file, fileList) {
+      console.log('response:', response)
+      console.log('file', file)
+      console.log('filelist', fileList)
+    },
+    handleOnError(err, file, fileList) {
+      console.log('response:', err)
+      console.log('file', file)
+      console.log('filelist', fileList)
     }
   }
 }
