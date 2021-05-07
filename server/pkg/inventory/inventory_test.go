@@ -1,6 +1,8 @@
 package inventory
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -375,6 +377,68 @@ func Test_isLessString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isLessString(tt.args.x, tt.args.y); got != tt.want {
 				t.Errorf("isLessString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_inventory_GetGroups(t *testing.T) {
+	inv := newInventory(make(map[string]Group))
+	for i := 0; i < 100; i++ {
+		err := inv.AddHostToGroup(fmt.Sprintf("testGroup%d", i), ParseHost(fmt.Sprintf("192.168.%d.1", i)), ParseHost(fmt.Sprintf("10.10.%d.[1:254]", i)), ParseHost(fmt.Sprintf("172.%d.[1:100].[128:254]", i)))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	type fields struct {
+		sortedGroupNames []string
+		groups           map[string]Group
+		isTruncatedGroup map[string]bool
+	}
+	type args struct {
+		limit int
+		page  int
+	}
+	tests := []struct {
+		name               string
+		fields             fields
+		args               args
+		wantTotalGroupsNum int
+		wantTotalPagesNum  int
+		wantGroups         map[string]Group
+	}{
+		{
+			name: "normal test",
+			fields: fields{
+				sortedGroupNames: inv.(*inventory).sortedGroupNames,
+				groups:           inv.(*inventory).groups,
+				isTruncatedGroup: inv.(*inventory).isTruncatedGroup,
+			},
+			args: args{
+				limit: 5,
+				page:  1,
+			},
+			wantTotalGroupsNum: 100,
+			wantTotalPagesNum:  21,
+			wantGroups:         map[string]Group{"all": inv.generateGroupAll(), "testGroup0": inv.getAllGroups()["testGroup0"], "testGroup1": inv.getAllGroups()["testGroup1"], "testGroup2": inv.getAllGroups()["testGroup2"], "testGroup3": inv.getAllGroups()["testGroup3"]},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := inventory{
+				sortedGroupNames: tt.fields.sortedGroupNames,
+				groups:           tt.fields.groups,
+				isTruncatedGroup: tt.fields.isTruncatedGroup,
+			}
+			gotTotalGroupsNum, gotTotalPagesNum, gotGroups := i.GetGroups(tt.args.limit, tt.args.page)
+			if gotTotalGroupsNum != tt.wantTotalGroupsNum {
+				t.Errorf("GetGroups() gotTotalGroupsNum = %v, want %v", gotTotalGroupsNum, tt.wantTotalGroupsNum)
+			}
+			if gotTotalPagesNum != tt.wantTotalPagesNum {
+				t.Errorf("GetGroups() gotTotalPagesNum = %v, want %v", gotTotalPagesNum, tt.wantTotalPagesNum)
+			}
+			if !reflect.DeepEqual(gotGroups, tt.wantGroups) {
+				t.Errorf("GetGroups() gotGroups = %v, want %v", gotGroups, tt.wantGroups)
 			}
 		})
 	}

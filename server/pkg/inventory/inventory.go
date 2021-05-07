@@ -105,7 +105,8 @@ func (i inventory) GetGroups(limit, page int) (totalGroupsNum, totalPagesNum int
 	// 加入all组进行页数计算
 	totalPagesNum = (totalGroupsNum+1)/limit + 1
 
-	startIdx := (page-1)*limit - 1
+	// 计算起始索引
+	startIdx := (page - 1) * limit
 	// 因加入了all组进行计算，起始索引需往前移动一位
 	startIdx--
 	if startIdx < -1 {
@@ -117,6 +118,7 @@ func (i inventory) GetGroups(limit, page int) (totalGroupsNum, totalPagesNum int
 	if totalPagesNum < page {
 		return
 	} else if totalPagesNum > page {
+		// 计算结束索引
 		endIdx = page*limit - 1
 		// 因加入了all组进行计算，结束索引需往前移动一位
 		endIdx--
