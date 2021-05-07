@@ -9,10 +9,11 @@ export function getAllIpaddr() {
 }
 
 // 获取inventory全部信息
-export function getInventoryInfo() {
+export function getInventoryInfo(query) {
   return request({
     url: '/api/v1/ansible/inventory/groups',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
 

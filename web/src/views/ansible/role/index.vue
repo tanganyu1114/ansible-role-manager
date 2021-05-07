@@ -20,6 +20,7 @@
           style="width: 100%"
           border
           @selection-change="handleSelectionChange"
+          @filter-change="handleFilterChange"
         >
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column type="index" label="序号" width="55" align="center" />
@@ -36,6 +37,7 @@
             prop="tags"
             :filters="filterData"
             :filter-method="filterTag"
+            column-key="tags"
             filter-placement="bottom-end"
           >
             <template slot-scope="scope">
@@ -81,12 +83,13 @@
             <el-upload
               ref="upload"
               class="upload-role"
+              accept=".zip, .tgz"
               :auto-upload="false"
               :on-change="handleOnChange"
               :before-upload="handleBeforeUpload"
               :data="uploadName"
+              :action="uploadUrl + form.uploadName"
               drag
-              action="https://jsonplaceholder.typicode.com/posts/"
             >
               <i class="el-icon-upload" />
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -144,11 +147,13 @@ export default {
       form: {
         uploadName: ''
       },
+      uploadUrl: process.env.VUE_APP_BASE_API + '/api/v1/ansible/roles/',
       // 查询参数
       total: 0,
       queryParams: {
         pageIndex: 1,
-        pageSize: 10
+        pageSize: 10,
+        tags: []
       },
       // 表单校验
       rules: {
@@ -183,6 +188,12 @@ export default {
     },
     handleDelete() {
     },
+    handleFilterChange(filter) {
+      console.log(filter.tags)
+      // TODO: 这里去请求后端role数据信息
+      // queryParams.tags = filter.tags
+      // getRoleInfo(queryParams)
+    },
     filterTag(value, row) {
       return row.tag === value
     },
@@ -200,7 +211,11 @@ export default {
     handleBeforeUpload(file) {
       const fileArr = file.name.split('.')
       const types = ['zip', 'tgz']
-      return types.includes(fileArr[fileArr.length - 1])
+      if (types.includes(fileArr[fileArr.length - 1])) {
+        return true
+      } else {
+        this.msgError('文件格式错误!')
+      }
     }
   }
 }

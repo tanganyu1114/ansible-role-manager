@@ -61,7 +61,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="IP总数" prop="ipTotal" align="center" width="100" />
+          <el-table-column label="IP总数" prop="hostsLen" align="center" width="100" />
           <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
@@ -69,6 +69,7 @@
                 size="mini"
                 type="text"
                 icon="el-icon-edit"
+                :disabled="scope.row.groupName==='all'"
                 @click="handleUpdate(scope.row)"
               >修改
               </el-button>
@@ -77,6 +78,7 @@
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
+                :disabled="scope.row.groupName==='all'"
                 @click="handleDelete(scope.row)"
               >删除
               </el-button>
@@ -85,8 +87,8 @@
         </el-table>
         <pagination
           :total="total"
-          :page.sync="queryParams.pageIndex"
-          :limit.sync="queryParams.pageSize"
+          :page.sync="queryParams.page"
+          :limit.sync="queryParams.limit"
           @pagination="getList"
         />
       </el-card>
@@ -179,8 +181,8 @@ export default {
       // 查询参数
       total: 0,
       queryParams: {
-        pageIndex: 1,
-        pageSize: 10
+        page: 1,
+        limit: 10
       },
       // 表单校验
       rules: {
@@ -203,23 +205,12 @@ export default {
     getList() {
       // todo: 把all和inventory信息合并放到后端统一返回，添加分页查询功能
       this.inventoryList = []
-      getAllIpaddr().then(response => {
+      getInventoryInfo(this.queryParams).then(response => {
         if (response.code === 200) {
-          const Ips = response.data
-          const data = {}
-          data.groupName = 'all'
-          data.ipAddrs = Ips
-          data.ipTotal = Ips.length
-          this.inventoryList.unshift(data)
-        } else {
-          this.msgError(response.msg)
-        }
-      })
-      getInventoryInfo().then(response => {
-        if (response.code === 200) {
-          const Gps = response.data
-          for (const data of Object.values(Gps)) {
-            data.ipTotal = data.ipAddrs.length
+          console.log(response.data)
+          this.total = response.data.totalGroupsNum + 1
+          for (const data of Object.values(response.data.groupsMap)) {
+            // data.ipTotal = data.hostsLen
             this.inventoryList.push(data)
           }
         } else {
@@ -240,6 +231,10 @@ export default {
       this.open = true
     },
     handleUpdate(row) {
+      if (row.groupName === 'all' || this.ids[0].groupName === 'all') {
+        this.single = this.multiple = false
+        return
+      }
       this.resetForm()
       this.title = '修改inventory'
       this.form.groupName = row.groupName || this.ids[0].groupName
