@@ -55,11 +55,13 @@
               <el-tag
                 v-for="ip in scope.row.ipAddrs"
                 :key="ip"
+                class="tag-ip"
               >
                 {{ ip }}
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="IP总数" prop="hostsLen" align="center" width="100" />
           <el-table-column label="操作" align="center" width="200" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
@@ -67,6 +69,7 @@
                 size="mini"
                 type="text"
                 icon="el-icon-edit"
+                :disabled="scope.row.groupName==='all'"
                 @click="handleUpdate(scope.row)"
               >修改
               </el-button>
@@ -75,6 +78,7 @@
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
+                :disabled="scope.row.groupName==='all'"
                 @click="handleDelete(scope.row)"
               >删除
               </el-button>
@@ -83,8 +87,8 @@
         </el-table>
         <pagination
           :total="total"
-          :page.sync="queryParams.pageIndex"
-          :limit.sync="queryParams.pageSize"
+          :page.sync="queryParams.page"
+          :limit.sync="queryParams.limit"
           @pagination="getList"
         />
       </el-card>
@@ -146,7 +150,7 @@
 </template>
 
 <script>
-import { getInventoryInfo, getAllIpaddr, addInventoryInfo, updateInventoryInfo, deleteInventoryInfo } from '@/api/ansible-inventory'
+import { getInventoryInfo, addInventoryInfo, updateInventoryInfo, deleteInventoryInfo } from '@/api/ansible-inventory'
 
 export default {
   name: 'Inventory',
@@ -177,8 +181,8 @@ export default {
       // 查询参数
       total: 0,
       queryParams: {
-        pageIndex: 1,
-        pageSize: 10
+        page: 1,
+        limit: 10
       },
       // 表单校验
       rules: {
@@ -200,19 +204,16 @@ export default {
   methods: {
     getList() {
       this.inventoryList = []
-      getAllIpaddr().then(response => {
-        const Ips = response.data
-        console.log(Ips)
-        const data = {}
-        data.groupName = 'all'
-        data.ipAddrs = Ips
-        this.inventoryList.unshift(data)
-      })
-      getInventoryInfo().then(response => {
-        const Gps = response.data
-        console.log(Gps)
-        for (const data of Object.values(Gps)) {
-          this.inventoryList.push(data)
+      getInventoryInfo(this.queryParams).then(response => {
+        if (response.code === 200) {
+          console.log(response.data)
+          this.total = response.data.totalGroupsNum + 1
+          for (const data of Object.values(response.data.groupsMap)) {
+            // data.ipTotal = data.hostsLen
+            this.inventoryList.push(data)
+          }
+        } else {
+          this.msgError(response.msg)
         }
       })
       this.loading = false
@@ -234,10 +235,18 @@ export default {
       this.form.groupName = row.groupName || this.ids[0].groupName
       this.form.ipAddrs = row.ipAddrs || this.ids[0].ipAddrs
       this.form.targetGroupName = this.form.groupName
+      if (this.form.groupName === 'all') {
+        this.single = this.multiple = false
+        return
+      }
       this.open = true
     },
     handleDelete(row) {
       const groupName = row.groupName || this.ids.map(item => item.groupName)
+      if (groupName === 'all') {
+        this.single = this.multiple = false
+        return
+      }
       this.$confirm(
         '是否确认删除组名为" ' + groupName + ' "的数据项?',
         '警告',
@@ -281,8 +290,8 @@ export default {
       }
     },
     cancel() {
+      this.resetForm()
       this.open = false
-      // TODO
     },
     // 动态tag函数信息
     handleClose(tag) {
@@ -298,8 +307,10 @@ export default {
 
     handleInputConfirm() {
       const inIp = this.inputIp
+      const ipSet = new Set(this.form.ipAddrs)
       if (this.validateIpaddr(inIp)) {
-        this.form.ipAddrs.push(inIp)
+        ipSet.add(inIp)
+        this.form.ipAddrs = [...ipSet]
       } else {
         this.$message.error('IP地址格式错误')
       }
@@ -327,6 +338,10 @@ export default {
 <style scoped>
 .el-tag + .el-tag {
   margin-left: 10px;
+}
+.tag-ip {
+  margin-left: 10px;
+  margin-bottom: 10px;
 }
 .btn-input-ip {
   margin-left: 10px;
