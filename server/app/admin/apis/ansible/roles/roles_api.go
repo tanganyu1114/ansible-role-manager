@@ -14,6 +14,7 @@ type RolesApi interface {
 	AddRoleByCompressedData(c *gin.Context)
 	DownloadRoleCompressedData(c *gin.Context)
 	RemoveRole(c *gin.Context)
+	GetRoleNameList(c *gin.Context)
 }
 
 type rolesApi struct {
@@ -105,4 +106,14 @@ func (r *rolesApi) RemoveRole(c *gin.Context) {
 		return
 	}
 	r.OK(c, nil, "删除role文件成功")
+}
+
+func (r *rolesApi) GetRoleNameList(c *gin.Context) {
+	// method: GET location: /
+	list, err := r.vo.GetRoleNameList()
+	if err != nil {
+		r.Error(c, http.StatusInternalServerError, err, "获取role名称列表失败")
+		return
+	}
+	r.OK(c, list, "获取role名称列表成功")
 }

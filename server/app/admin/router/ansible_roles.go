@@ -16,6 +16,7 @@ func registerAnsibleRolesRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTM
 	api := roles.NewRolesApi()
 	r := v1.Group("ansible/roles").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
+		r.GET("/", api.GetRoleNameList)
 		r.POST("/:role", api.AddRoleByCompressedData)
 		r.GET("/:role", api.DownloadRoleCompressedData)
 		r.DELETE("/:role", api.RemoveRole)

@@ -6,6 +6,7 @@ type Roles interface {
 	ImportRoleData(roleName string, compressedData []byte) error
 	ExportRoleData(roleName string) ([]byte, error)
 	RemoveRole(roleName string) error
+	GetRoleNameList() ([]string, error)
 }
 
 type roles struct {
@@ -29,4 +30,9 @@ func (r roles) ExportRoleData(roleName string) ([]byte, error) {
 func (r roles) RemoveRole(roleName string) error {
 	bo := svc.GetSingletonRolesIns()
 	return bo.RemoveRole(roleName)
+}
+
+func (r roles) GetRoleNameList() ([]string, error) {
+	bo := svc.GetSingletonRolesIns()
+	return bo.GetRoleNameList()
 }

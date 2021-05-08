@@ -16,6 +16,7 @@ type Roles interface {
 	ImportRoleData(roleName string, compressedData []byte) error
 	ExportRoleData(roleName string) ([]byte, error)
 	RemoveRole(roleName string) error
+	GetRoleNameList() ([]string, error)
 }
 
 type roles struct {
@@ -69,4 +70,23 @@ func (r roles) RemoveRole(roleName string) error {
 		return err
 	}
 	return os.RemoveAll(roleName)
+}
+
+func (r roles) GetRoleNameList() ([]string, error) {
+	files, err := filepath.Glob(filepath.Join(r.workspace, "*"))
+	if err != nil {
+		return nil, err
+	}
+	roleNameList := make([]string, 0)
+	for _, file := range files {
+		stat, err := os.Stat(file)
+		if err != nil {
+			return nil, err
+		}
+		if stat.IsDir() {
+			// TODO: 判断该目录是否为role文件目录：1）查看是否存在role的描述文件，否则判断其不为role文件目录；2）描述文件是否可以被正确解析，否则判断其不为role文件目录
+			roleNameList = append(roleNameList, stat.Name())
+		}
+	}
+	return roleNameList, nil
 }
