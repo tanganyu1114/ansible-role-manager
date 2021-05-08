@@ -84,7 +84,7 @@ func (i *inventory) RemoveGroup(groupName string) error {
 }
 
 func (i *inventory) GetGroups(limit, page int) Groups {
-	groupsVO := &Groups{}
+	groupsVO := &Groups{GroupsMap: make(map[string]Group)}
 	groupC := newGroupVOConverter()
 	_ = i.boDO(false, func(invBO svc.Inventory) error {
 		gn, pn, groupsBO := invBO.GetGroups(limit, page)

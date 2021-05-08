@@ -167,7 +167,7 @@ func (i inventory) generateGroupAll() Group {
 }
 
 func (i *inventory) sortGroups() {
-	sort.SliceIsSorted(i.sortedGroupNames, func(x, y int) bool {
+	sort.Slice(i.sortedGroupNames, func(x, y int) bool {
 		return isLessString(i.sortedGroupNames[x], i.sortedGroupNames[y])
 	})
 }
@@ -180,6 +180,8 @@ func (i *inventory) searchGroup(groupName string) int {
 }
 
 func isLessString(x, y string) bool {
+	// DONE: 数字字符串按数值大小排序
+	x, y = strings.ToLower(x), strings.ToLower(y)
 	xLen := len(x)
 	yLen := len(y)
 	var minLen int
@@ -190,10 +192,58 @@ func isLessString(x, y string) bool {
 	}
 
 	for j := 0; j < minLen; j++ {
-		if x[j] == y[j] {
+		switch {
+		case x[j] == y[j]:
 			continue
+		case isNum(x[j]):
+			switch {
+			case isNum(y[j]):
+				return isLessNumHead(x[j:], y[j:])
+			default:
+				return true
+			}
+		case isNum(y[j]):
+			switch {
+			case isNum(x[j]):
+				return isLessNumHead(x[j:], y[j:])
+			default:
+				return false
+			}
+		default:
+			return x[j] < y[j]
 		}
-		return x[j] < y[j]
 	}
 	return xLen == minLen && xLen != yLen
+}
+
+func isLessNumHead(x, y string) bool {
+	n := len(x)
+	m := len(y)
+	var i, j int
+	var xNumHead, yNumHead int
+	for i < n || j < m {
+		if i < n {
+			if isNum(x[i]) {
+				xNumHead *= 10
+				xNumHead += int(x[i] - '0')
+				i++
+			} else {
+				i = n
+			}
+		}
+		if j < m {
+			if isNum(y[j]) {
+				yNumHead *= 10
+				yNumHead += int(y[j] - '0')
+				j++
+			} else {
+				j = m
+			}
+		}
+	}
+	return xNumHead < yNumHead
+}
+
+func isNum(s byte) bool {
+	return s >= '0' && s <= '9'
 }

@@ -384,7 +384,7 @@ func Test_isLessString(t *testing.T) {
 
 func Test_inventory_GetGroups(t *testing.T) {
 	inv := newInventory(make(map[string]Group))
-	for i := 0; i < 100; i++ {
+	for i := 99; i >= 0; i-- {
 		err := inv.AddHostToGroup(fmt.Sprintf("testGroup%d", i), ParseHost(fmt.Sprintf("192.168.%d.1", i)), ParseHost(fmt.Sprintf("10.10.%d.[1:254]", i)), ParseHost(fmt.Sprintf("172.%d.[1:100].[128:254]", i)))
 		if err != nil {
 			t.Fatal(err)
@@ -421,6 +421,36 @@ func Test_inventory_GetGroups(t *testing.T) {
 			wantTotalGroupsNum: 100,
 			wantTotalPagesNum:  21,
 			wantGroups:         map[string]Group{"all": inv.generateGroupAll(), "testGroup0": inv.getAllGroups()["testGroup0"], "testGroup1": inv.getAllGroups()["testGroup1"], "testGroup2": inv.getAllGroups()["testGroup2"], "testGroup3": inv.getAllGroups()["testGroup3"]},
+		},
+		{
+			name: "normal test page 2",
+			fields: fields{
+				sortedGroupNames: inv.(*inventory).sortedGroupNames,
+				groups:           inv.(*inventory).groups,
+				isTruncatedGroup: inv.(*inventory).isTruncatedGroup,
+			},
+			args: args{
+				limit: 5,
+				page:  2,
+			},
+			wantTotalGroupsNum: 100,
+			wantTotalPagesNum:  21,
+			wantGroups:         map[string]Group{"testGroup4": inv.getAllGroups()["testGroup4"], "testGroup5": inv.getAllGroups()["testGroup5"], "testGroup6": inv.getAllGroups()["testGroup6"], "testGroup7": inv.getAllGroups()["testGroup7"], "testGroup8": inv.getAllGroups()["testGroup8"]},
+		},
+		{
+			name: "normal test last page",
+			fields: fields{
+				sortedGroupNames: inv.(*inventory).sortedGroupNames,
+				groups:           inv.(*inventory).groups,
+				isTruncatedGroup: inv.(*inventory).isTruncatedGroup,
+			},
+			args: args{
+				limit: 5,
+				page:  21,
+			},
+			wantTotalGroupsNum: 100,
+			wantTotalPagesNum:  21,
+			wantGroups:         map[string]Group{"testGroup99": inv.getAllGroups()["testGroup99"]},
 		},
 	}
 	for _, tt := range tests {
